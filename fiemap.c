@@ -49,7 +49,7 @@ static struct fiemap *alloc_fiemap(const __u32 extent_count)
                         + sizeof(struct fiemap_extent) * (size_t)extent_count);
 }
 
-static void show_extents(const int fd)
+static struct fiemap *get_fiemap(const int fd)
 {
     // TODO: Get extent_count dynamically via an initial fiemap ioctl call with
     //       FIEMAP_FLAG_NUM_EXTENTS. Bue keep race conditions in mind!
@@ -65,7 +65,14 @@ static void show_extents(const int fd)
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("ioctl error: %s", strerror(errno)); // TODO: does it set errno?
 
-    for (int i = 0; i < extent_count; ++i) {
+    return fmp;
+}
+
+static void show_extents(FILE *const fp)
+{
+    struct fiemap *const fmp = get_fiemap(fileno(fp));
+
+    for (__u32 i = 0u; i < fmp->fm_extent_count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
         if (k_skip_unwritten != (0)
@@ -89,7 +96,7 @@ int main(int argc, char **argv)
 
     FILE *const fp = fopen(argv[1], "r");
     if (!fp) die("can't open \"%s\": %s", argv[1], strerror(errno));
-    show_extents(fileno(fp));
+    show_extents(fp);
     fclose(fp);
 
     return EXIT_SUCCESS;
