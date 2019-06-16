@@ -3,3 +3,6 @@
 
 # Don't sync the symlink to a big file elsewhere.
 /test-symlink
+
+# Ignore dumps from files and devices.
+/dump*
