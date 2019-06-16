@@ -2,7 +2,14 @@
 //  - https://lwn.net/Articles/260803/ and
 //  - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+#endif
 #define _POSIX_C_SOURCE 1
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include <errno.h>
 #include <stdarg.h>

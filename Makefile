@@ -1,4 +1,10 @@
-CFLAGS += -std=c11 -pedantic-errors -Wall -Wextra -fsanitize=address,undefined -g
+CFLAGS += -std=c11 -fsanitize=address,undefined -g
+
+ifeq ($(CC),clang-9)
+	CFLAGS += -Weverything -Wno-disabled-macro-expansion
+else
+	CFLAGS += -pedantic-errors -Wall -Wextra
+endif
 
 all: fiemap
 
