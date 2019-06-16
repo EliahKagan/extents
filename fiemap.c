@@ -63,7 +63,7 @@ static void show_extents(const int fd)
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
         printf("physical: %13llu      logical: %9llu      length: %9llu\n",
-                fep->fe_physical, fep->fe_logical, fep->fe_length);
+                fep->fe_physical / 512, fep->fe_logical, fep->fe_length);
 
         if (fmp->fm_extents[i].fe_flags & FIEMAP_EXTENT_LAST) break;
     }
