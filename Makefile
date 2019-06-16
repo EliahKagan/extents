@@ -1,4 +1,4 @@
-CFLAGS += -ansi -pedantic-errors -Wall -Wextra
+CFLAGS += -std=c11 -pedantic-errors -Wall -Wextra
 
 all: fiemap
 
