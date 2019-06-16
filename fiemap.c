@@ -59,11 +59,11 @@ static void show_extents(const int fd)
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("ioctl error: %s", strerror(errno)); /* TODO: does it set errno? */
 
-    /* printf("fm_extent_count = %" PRIu32 "\n", fmp->fm_extent_count); */
-
     for (i = 0; i < extent_count; ++i) {
-        printf("offset: %llu   length: %llu\n",
-                fmp->fm_extents[i].fe_physical, fmp->fm_extents[i].fe_length);
+        const struct fiemap_extent *const fep = &fmp->fm_extents[i];
+
+        printf("physical: %llu   logical: %llu   length: %llu\n",
+                fep->fe_physical, fep->fe_logical, fep->fe_length);
 
         if (fmp->fm_extents[i].fe_flags & FIEMAP_EXTENT_LAST) break;
     }
