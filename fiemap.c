@@ -2,6 +2,8 @@
  *     See https://lwn.net/Articles/260803/.
  */
 
+#define _POSIX_C_SOURCE 1
+
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
