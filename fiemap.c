@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <linux/fiemap.h>
+#include <linux/fs.h>
 #include <sys/ioctl.h>
 
 static const char *g_progname;
@@ -55,7 +56,7 @@ static void show_extents(const int fd)
     fmp->fm_extent_count = extent_count;
     fmp->fm_flags = 0; /* not sure if this would work */
 
-    if (ioctl(fd, FIEMAP, fmp) != 0)
+    if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("ioctl error: %s", strerror(errno)); /* TODO: does it set errno? */
 
     /* FIXME: actually show the extents */
