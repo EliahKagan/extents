@@ -1,5 +1,6 @@
-/* ioctl-1.c - Trying out FIEMAP ioctl.
- *     See https://lwn.net/Articles/260803/.
+/* ioctl-1.c - Trying out FIEMAP ioctl. See:
+    - https://lwn.net/Articles/260803/ and
+    - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h
  */
 
 #define _POSIX_C_SOURCE 1
