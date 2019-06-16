@@ -50,6 +50,7 @@ static void show_extents(const int fd)
     enum { extent_count = 1024 };
 
     struct fiemap *const fmp = alloc_fiemap(extent_count);
+    int i = 0;
 
     fmp->fm_start = 0;
     fmp->fm_length = ~0ULL;
@@ -59,8 +60,14 @@ static void show_extents(const int fd)
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("ioctl error: %s", strerror(errno)); /* TODO: does it set errno? */
 
-    /* FIXME: actually show the extents */
-    printf("fm_extent_count = %" PRIu32 "\n", fmp->fm_extent_count);
+    /* printf("fm_extent_count = %" PRIu32 "\n", fmp->fm_extent_count); */
+
+    for (i = 0; i < extent_count; ++i) {
+        printf("offset: %" PRIu64 "   length: %" PRIu64 "\n",
+                fmp->fm_extents[i].fe_offset, fmp->fm_extents[i].fe_length);
+
+        if (fmp->fm_extents[i].fe_flags & FIEMAP_EXTENT_LAST) break;
+    }
 
     free(fmp);
 }
