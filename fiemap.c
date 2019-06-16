@@ -96,7 +96,7 @@ static void show_extents(FILE *const fp)
         printf("physical: %13llu      logical: %9llu      length: %9llu\n",
                 fep->fe_physical / 512, fep->fe_logical, fep->fe_length / 512);
 
-        if (fep->fe_flags & FIEMAP_EXTENT_LAST) break;
+        // if (fep->fe_flags & FIEMAP_EXTENT_LAST) break;
     }
 
     free(fmp);
