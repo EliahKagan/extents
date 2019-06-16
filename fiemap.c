@@ -61,7 +61,7 @@ static void show_extents(const int fd)
     int i = 0;
 
     fmp->fm_start = 0;
-    fmp->fm_length = ~0ULL;
+    fmp->fm_length = ~(__u64)0;
     fmp->fm_extent_count = extent_count;
     fmp->fm_flags = 0; /* not sure if this would work */
 
