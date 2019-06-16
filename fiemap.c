@@ -88,15 +88,12 @@ static struct fiemap *get_fiemap(const int fd)
 static void show_extents(FILE *const fp)
 {
     struct fiemap *const fmp = get_fiemap(fileno(fp));
-    const __u32 count = min(fmp->fm_extent_count, fmp->fm_mapped_extents);
 
-    for (__u32 i = 0u; i < count; ++i) {
+    for (__u32 i = 0u; i < fmp->fm_extent_count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
         printf("physical: %13llu      logical: %9llu      length: %9llu\n",
                 fep->fe_physical / 512, fep->fe_logical, fep->fe_length / 512);
-
-        // if (fep->fe_flags & FIEMAP_EXTENT_LAST) break;
     }
 
     free(fmp);
