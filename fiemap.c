@@ -56,7 +56,7 @@ static struct fiemap *alloc_fiemap(const __u32 extent_count)
 
 static __u32 count_extents(const int fd)
 {
-    struct fiemap fm = { .fm_extent_count = 0 };
+    struct fiemap fm = { .fm_length = ~0ULL, .fm_extent_count = 0 };
     
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
         die("ioctl error counting extents: %s", strerror(errno)); // TODO: does it set errno?
