@@ -1,4 +1,4 @@
-CFLAGS += -std=c11 -pedantic-errors -Wall -Wextra -fsanitize=address,undefined -g -Og
+CFLAGS += -std=c11 -pedantic-errors -Wall -Wextra -fsanitize=address,undefined -g
 
 all: fiemap
 
