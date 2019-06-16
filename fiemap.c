@@ -3,7 +3,6 @@
  */
 
 #include <errno.h>
-#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +62,7 @@ static void show_extents(const int fd)
     /* printf("fm_extent_count = %" PRIu32 "\n", fmp->fm_extent_count); */
 
     for (i = 0; i < extent_count; ++i) {
-        printf("offset: %" PRIu64 "   length: %" PRIu64 "\n",
+        printf("offset: %llu   length: %llu\n",
                 fmp->fm_extents[i].fe_physical, fmp->fm_extents[i].fe_length);
 
         if (fmp->fm_extents[i].fe_flags & FIEMAP_EXTENT_LAST) break;
