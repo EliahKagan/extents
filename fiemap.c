@@ -36,6 +36,11 @@ static noreturn void die(const char *const format, ...)
     exit(EXIT_FAILURE);
 }
 
+static __u32 min(const __u32 first, const __u32 second)
+{
+    return second < first ? second : first;
+}
+
 static void *xcalloc(const size_t count, const size_t size)
 {
     void *const ret = calloc(count, size);
@@ -71,8 +76,9 @@ static struct fiemap *get_fiemap(const int fd)
 static void show_extents(FILE *const fp)
 {
     struct fiemap *const fmp = get_fiemap(fileno(fp));
+    const __u32 count = min(fmp->fm_extent_count, fmp->fm_mapped_extents);
 
-    for (__u32 i = 0u; i < fmp->fm_extent_count; ++i) {
+    for (__u32 i = 0u; i < count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
         if (k_skip_unwritten != (0)
