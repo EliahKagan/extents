@@ -54,21 +54,32 @@ static struct fiemap *alloc_fiemap(const __u32 extent_count)
                         + sizeof(struct fiemap_extent) * (size_t)extent_count);
 }
 
+static __u32 count_extents(const int fd)
+{
+    struct fiemap fm = { .fm_extent_count = 0 };
+    
+    if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
+        die("ioctl error counting extents: %s", strerror(errno)); // TODO: does it set errno?
+
+    return fm.fm_extent_count;
+}
+
 static struct fiemap *get_fiemap(const int fd)
 {
-    // TODO: Get extent_count dynamically via an initial fiemap ioctl call with
-    //       FIEMAP_FLAG_NUM_EXTENTS. Bue keep race conditions in mind!
-    enum { extent_count = 1024 };
-
+    const __u32 extent_count = count_extents(fd);
     struct fiemap *const fmp = alloc_fiemap(extent_count);
 
     fmp->fm_start = 0;
     fmp->fm_length = ~0ULL;
-    fmp->fm_extent_count = 0; // return the correct size
-    fmp->fm_flags = 0; // not sure if this is right
+    fmp->fm_extent_count = extent_count;
+    fmp->fm_flags = 0;
 
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
-        die("ioctl error: %s", strerror(errno)); // TODO: does it set errno?
+        die("ioctl error retrieving extents: %s", strerror(errno)); // TODO: does it set errno?
+
+    // Protect against UB due to TOCTOU race condition.
+    if (fmp->fm_mapped_extents != extent_count)
+        die("number of extents changed unexpectedly");
 
     return fmp;
 }
