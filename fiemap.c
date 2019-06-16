@@ -64,7 +64,7 @@ static struct fiemap *get_fiemap(const int fd)
 
     fmp->fm_start = 0;
     fmp->fm_length = ~0ULL;
-    fmp->fm_extent_count = extent_count;
+    fmp->fm_extent_count = 0; // return the correct size
     fmp->fm_flags = 0; // not sure if this is right
 
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
