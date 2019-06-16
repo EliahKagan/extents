@@ -61,7 +61,7 @@ static __u32 count_extents(const int fd)
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
         die("ioctl error counting extents: %s", strerror(errno)); // TODO: does it set errno?
 
-    return fm.fm_extent_count;
+    return fm.fm_mapped_extents;
 }
 
 static struct fiemap *get_fiemap(const int fd)
