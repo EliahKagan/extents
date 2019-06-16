@@ -53,7 +53,7 @@ static struct fiemap *get_fiemap(const int fd)
 {
     // TODO: Get extent_count dynamically via an initial fiemap ioctl call with
     //       FIEMAP_FLAG_NUM_EXTENTS. Bue keep race conditions in mind!
-    enum { extent_count = 1024 };
+    enum { extent_count = 64 };
 
     struct fiemap *const fmp = alloc_fiemap(extent_count);
 
