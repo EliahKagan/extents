@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     if (argc > 2) die("too many arguments");
 
     fp = fopen(argv[1], "r");
-    if (!fp) die("%s: can't open \"%s\"", argv[1], strerror(errno));
+    if (!fp) die("can't open \"%s\": %s", argv[1], strerror(errno));
     show_extents(fileno(fp));
     fclose(fp);
 
