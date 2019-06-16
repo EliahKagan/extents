@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     if (argc < 2) die("too few arguments");
     if (argc > 2) die("too many arguments");
 
-    FILE *const fp = fopen(argv[1], "r");
+    FILE *const fp = fopen(argv[1], "rb");
     if (!fp) die("can't open \"%s\": %s", argv[1], strerror(errno));
     show_extents(fp);
     fclose(fp);
