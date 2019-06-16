@@ -1,6 +1,9 @@
 # Ignore the compiled binary.
 /fiemap
 
+# Ignore precompiled headers.
+/.vscode/ipch/
+
 # Don't sync the symlink to a big file elsewhere.
 /test-symlink
 
