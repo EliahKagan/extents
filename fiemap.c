@@ -50,7 +50,7 @@ static void *xcalloc(const size_t count, const size_t size)
 
 static struct fiemap *alloc_fiemap(const __u32 extent_count)
 {
-    return xcalloc(1, sizeof(struct fiemap)
+    return xcalloc(1u, sizeof(struct fiemap)
                         + sizeof(struct fiemap_extent) * (size_t)extent_count);
 }
 
