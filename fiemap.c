@@ -68,7 +68,8 @@ static void show_extents(const int fd)
     for (int i = 0; i < extent_count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
-        if (k_skip_unwritten && (fep->fe_flags & FIEMAP_EXTENT_UNWRITTEN))
+        if (k_skip_unwritten != (0)
+                && (fep->fe_flags & FIEMAP_EXTENT_UNWRITTEN))
             continue;
 
         printf("physical: %13llu      logical: %9llu      length: %9llu\n",
