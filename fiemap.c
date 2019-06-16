@@ -37,11 +37,6 @@ static noreturn void die(const char *const format, ...)
     exit(EXIT_FAILURE);
 }
 
-static __u32 min(const __u32 first, const __u32 second)
-{
-    return second < first ? second : first;
-}
-
 static void *xcalloc(const size_t count, const size_t size)
 {
     void *const ret = calloc(count, size);
