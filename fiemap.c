@@ -65,7 +65,7 @@ static struct fiemap *get_fiemap(const int fd)
     fmp->fm_start = 0;
     fmp->fm_length = ~0ULL;
     fmp->fm_extent_count = extent_count;
-    fmp->fm_flags = 0; // not sure if this is right
+    fmp->fm_flags = FIEMAP_FLAG_NUM_EXTENTS; // not sure if this is right
 
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("ioctl error: %s", strerror(errno)); // TODO: does it set errno?
