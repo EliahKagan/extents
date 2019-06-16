@@ -21,12 +21,6 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 
-#ifdef SKIP_UNWRITTEN
-enum { k_skip_unwritten = 1 };
-#else
-enum { k_skip_unwritten = 0 };
-#endif
-
 static const char *g_progname;
 
 static noreturn void die(const char *const format, ...)
@@ -98,10 +92,6 @@ static void show_extents(FILE *const fp)
 
     for (__u32 i = 0u; i < count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
-
-        if (k_skip_unwritten != (0)
-                && (fep->fe_flags & FIEMAP_EXTENT_UNWRITTEN))
-            continue;
 
         printf("physical: %13llu      logical: %9llu      length: %9llu\n",
                 fep->fe_physical / 512, fep->fe_logical, fep->fe_length / 512);
