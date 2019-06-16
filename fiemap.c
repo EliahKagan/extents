@@ -64,7 +64,7 @@ static void show_extents(const int fd)
 
     for (i = 0; i < extent_count; ++i) {
         printf("offset: %" PRIu64 "   length: %" PRIu64 "\n",
-                fmp->fm_extents[i].fe_offset, fmp->fm_extents[i].fe_length);
+                fmp->fm_extents[i].fe_physical, fmp->fm_extents[i].fe_length);
 
         if (fmp->fm_extents[i].fe_flags & FIEMAP_EXTENT_LAST) break;
     }
