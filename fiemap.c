@@ -44,8 +44,8 @@ static void ensure_extents_retrieved(const struct fiemap *const fmp)
     assert(fmp->fm_mapped_extents <= fmp->fm_extent_count);
 
     if (fmp->fm_mapped_extents
-            && (fmp->fm_extents[fmp->fm_mapped_extents - 1u].fe_flags
-                & FIEMAP_EXTENT_LAST))
+            && !(fmp->fm_extents[fmp->fm_mapped_extents - 1u].fe_flags
+                 & FIEMAP_EXTENT_LAST))
         die("number of extents increased unexpectedly");
 }
 
