@@ -5,6 +5,9 @@
 # Precompiled headers.
 /.vscode/ipch/
 
+# Editor tempfiles.
+.*.swp
+
 # A symlink to a big file elsewhere.
 /test-symlink
 
