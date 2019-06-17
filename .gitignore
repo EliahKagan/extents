@@ -5,7 +5,7 @@
 # Precompiled headers.
 /.vscode/ipch/
 
-# A s ymlink to a big file elsewhere.
+# A symlink to a big file elsewhere.
 /test-symlink
 
 # Dumps from files and devices.
