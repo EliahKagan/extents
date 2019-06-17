@@ -17,8 +17,18 @@
 #include <linux/fiemap.h>
 #include <linux/fs.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 
 enum filesystem_constants { k_sector_size = 512 };
+
+ATTRIBUTE((nonnull))
+__u64 get_offset(const int fd)
+{
+    struct stat st =  { 0 };
+    if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
+
+    return 0LL; // FIXME: implement the rest of the function instead
+}
 
 ATTRIBUTE((malloc, returns_nonnull))
 static struct fiemap *alloc_fiemap(const __u32 extent_count)
@@ -43,6 +53,7 @@ static __u32 count_extents(const int fd)
 ATTRIBUTE((nonnull))
 static void ensure_extents_retrieved(const struct fiemap *const fmp)
 {
+    assert(fmp);
     assert(fmp->fm_mapped_extents <= fmp->fm_extent_count);
 
     if (fmp->fm_mapped_extents
@@ -84,27 +95,31 @@ static void show_labels(void)
             k_length_width, "LENGTH");
 }
 
-ATTRIBUTE((nonnull))
-static void show_extent(const struct fiemap_extent *const fep)
+ATTRIBUTE((nonnull(1)))
+static void show_extent(const struct fiemap_extent *const fep,
+                        const __u64 offset)
 {
+    assert(fep);
+    const __u64 physical = offset + fep->fe_physical;
+
     printf("%*llu B = %*llu   %*llu B = %*llu   %*llu B = %*llu\n",
             k_logical_width, fep->fe_logical,
             k_logical_short_width, fep->fe_logical / k_sector_size,
-            k_physical_width, fep->fe_physical,
-            k_physical_short_width, fep->fe_physical / k_sector_size,
+            k_physical_width, physical,
+            k_physical_short_width, physical / k_sector_size,
             k_length_width, fep->fe_length,
             k_length_short_width, fep->fe_length / k_sector_size);
 }
 
 ATTRIBUTE((nonnull))
-static void show_all_extents(FILE *const fp)
+static void show_all_extents(const int fd)
 {
-    assert(fp);
-    struct fiemap *const fmp = get_fiemap(fileno(fp));
+    const __u64 offset = get_offset(fd);
+    struct fiemap *const fmp = get_fiemap(fd);
 
     show_labels();
     for (__u32 i = 0u; i < fmp->fm_mapped_extents; ++i)
-        show_extent(&fmp->fm_extents[i]);
+        show_extent(&fmp->fm_extents[i], offset);
 
     free(fmp);
 }
@@ -117,7 +132,7 @@ int main(int argc, char **argv)
 
     FILE *const fp = fopen(argv[1], "rb");
     if (!fp) die("can't open \"%s\": %s", argv[1], strerror(errno));
-    show_all_extents(fp);
+    show_all_extents(fileno(fp));
     fclose(fp);
 
     return EXIT_SUCCESS;
