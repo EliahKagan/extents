@@ -9,9 +9,6 @@ endif
 
 all: fiemap
 
-#fiemap: fiemap.o # FIXME: should be able to remove this
-#	cc -o fiemap fiemap.o
-
 fiemap.o: fiemap.c feature-test.h
 
 #fiemap: feature-test.h
