@@ -103,7 +103,7 @@ static void show_all_extents(FILE *const fp)
     struct fiemap *const fmp = get_fiemap(fileno(fp));
 
     show_labels();
-    for (__u32 i = 0u; i < fmp->fm_extent_count; ++i)
+    for (__u32 i = 0u; i < fmp->fm_mapped_extents; ++i)
         show_extent(&fmp->fm_extents[i]);
 
     free(fmp);
