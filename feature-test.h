@@ -4,6 +4,8 @@
 #ifndef HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
 #define HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
 
+//#error This should stop compilation from succeeding.
+
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"

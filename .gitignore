@@ -1,11 +1,12 @@
-# Ignore the compiled binary.
+# Compiled binaries.
 /fiemap
+/fiemap.o
 
-# Ignore precompiled headers.
+# Precompiled headers.
 /.vscode/ipch/
 
-# Don't sync the symlink to a big file elsewhere.
+# A s ymlink to a big file elsewhere.
 /test-symlink
 
-# Ignore dumps from files and devices.
+# Dumps from files and devices.
 /dump*

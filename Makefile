@@ -6,8 +6,12 @@ else
 	CFLAGS += -pedantic-errors -Wall -Wextra
 endif
 
-all: fiemap
+all: fiemap.o
+
+fiemap.o: fiemap.c feature-test.h
+
+#fiemap: feature-test.h
 
 .PHONY: clean
 clean:
-	rm -f fiemap
+	rm -f fiemap fiemap.o
