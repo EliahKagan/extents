@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +29,7 @@ static struct fiemap *alloc_fiemap(const __u32 extent_count)
 
 static __u32 count_extents(const int fd)
 {
-    struct fiemap fm = { .fm_length = ~0ULL, .fm_extent_count = 0 };
+    struct fiemap fm = { .fm_length = ULLONG_MAX, .fm_extent_count = 0 };
 
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
         die("ioctl error counting extents: %s", strerror(errno)); // TODO: does it set errno?
@@ -57,7 +58,7 @@ static struct fiemap *get_fiemap(const int fd)
     struct fiemap *const fmp = alloc_fiemap(extent_count);
 
     fmp->fm_start = 0uLL;
-    fmp->fm_length = ~0uLL;
+    fmp->fm_length = ULLONG_MAX;
     fmp->fm_extent_count = extent_count;
     fmp->fm_flags = 0u;
 
