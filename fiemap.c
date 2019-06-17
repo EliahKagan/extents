@@ -3,8 +3,9 @@
 //  - https://lwn.net/Articles/287905/ - documents some important changes
 //  - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h
 
-#include "attribute.h"
 #include "feature-test.h"
+
+#include "attribute.h"
 #include "util.h"
 
 #include <assert.h>

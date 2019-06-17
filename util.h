@@ -3,8 +3,9 @@
 #ifndef HAVE_IOCTL_1_FIEMAP_UTIL_H_
 #define HAVE_IOCTL_1_FIEMAP_UTIL_H_
 
-#include "attribute.h"
 #include "feature-test.h"
+
+#include "attribute.h"
 
 #include <stddef.h>
 #include <stdnoreturn.h>
