@@ -5,6 +5,7 @@
 #include "feature-test.h"
 #include "util.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,13 +54,14 @@ static struct fiemap *get_fiemap(const int fd)
 
 static void show_extents(FILE *const fp)
 {
+    assert(fp);
+    struct fiemap *const fmp = get_fiemap(fileno(fp));
+
     enum {
         logical_width = 11, logical_short_width = 8,
         physical_width = 13, physical_short_width = 10,
         length_width = 9, length_short_width = 6
     };
-
-    struct fiemap *const fmp = get_fiemap(fileno(fp));
 
     printf("%*s     %*s   %*s     %*s   %*s\n",
             logical_width, "LOGICAL", logical_short_width, "",

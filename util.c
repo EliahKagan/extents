@@ -23,6 +23,7 @@ const char *progname(void)
 
 noreturn void die(const char *restrict const format, ...)
 {
+    assert(format);
     fprintf(stderr, "%s: error: ", g_progname);
 
     va_list vlist;
