@@ -1,15 +1,15 @@
-# Compiled binaries.
+# Compiled binaries
 /fiemap
 /*.o
 
-# Precompiled headers.
+# Precompiled headers
 /.vscode/ipch/
 
-# Editor tempfiles.
+# Editor tempfiles
 .*.swp
 
-# A symlink to a big file elsewhere.
+# A symlink to a big file elsewhere
 /test-symlink
 
-# Dumps from files and devices.
+# Dumps from files and devices
 /dump*
