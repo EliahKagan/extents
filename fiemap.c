@@ -22,7 +22,7 @@
 enum filesystem_constants { k_sector_size = 512 };
 
 ATTRIBUTE((nonnull))
-__u64 get_offset(const int fd)
+static __u64 get_offset(const int fd)
 {
     struct stat st =  { 0 };
     if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
