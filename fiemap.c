@@ -46,7 +46,7 @@ static struct fiemap *alloc_fiemap(const __u32 extent_count)
 static __u32 count_extents(const int fd)
 {
     struct fiemap fm = { .fm_length = ~0ULL, .fm_extent_count = 0 };
-    
+
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
         die("ioctl error counting extents: %s", strerror(errno)); // TODO: does it set errno?
 
@@ -75,13 +75,28 @@ static struct fiemap *get_fiemap(const int fd)
 
 static void show_extents(FILE *const fp)
 {
+    enum {
+        sector_size = 512,
+        physical_width = 13, physical_short_width = 11,
+        width = 9, short_width = 7
+    };
+
     struct fiemap *const fmp = get_fiemap(fileno(fp));
+
+    printf("%*s  %*s         %*s  %*s        %*s\n",
+            physical_width, "PHYSICAL", physical_short_width, "",
+            width, "LOGICAL", short_width, "", width, "LENGTH");
 
     for (__u32 i = 0u; i < fmp->fm_extent_count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
-        printf("physical: %13llu      logical: %9llu      length: %9llu\n",
-                fep->fe_physical / 512, fep->fe_logical, fep->fe_length / 512);
+        printf("%*llu (%*llu sec.)   %*llu (%*llu sec.)   %*llu (%*llu sec.)\n",
+                physical_width, fep->fe_physical,
+                physical_short_width, fep->fe_physical / sector_size,
+                width, fep->fe_logical,
+                short_width, fep->fe_logical / sector_size,
+                width, fep->fe_length,
+                short_width, fep->fe_length / sector_size);
     }
 
     free(fmp);
