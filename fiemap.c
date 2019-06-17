@@ -14,6 +14,8 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 
+enum constants { k_sector_size = 512 };
+
 static const char *g_progname;
 
 static noreturn void die(const char *const format, ...)
@@ -76,7 +78,6 @@ static struct fiemap *get_fiemap(const int fd)
 static void show_extents(FILE *const fp)
 {
     enum {
-        sector_size = 512,
         logical_width = 11, logical_short_width = 8,
         physical_width = 13, physical_short_width = 10,
         length_width = 9, length_short_width = 6
@@ -94,11 +95,11 @@ static void show_extents(FILE *const fp)
 
         printf("%*llu B = %*llu   %*llu B = %*llu   %*llu B = %*llu\n",
                 logical_width, fep->fe_logical,
-                logical_short_width, fep->fe_logical / sector_size,
+                logical_short_width, fep->fe_logical / k_sector_size,
                 physical_width, fep->fe_physical,
-                physical_short_width, fep->fe_physical / sector_size,
+                physical_short_width, fep->fe_physical / k_sector_size,
                 length_width, fep->fe_length,
-                length_short_width, fep->fe_length / sector_size);
+                length_short_width, fep->fe_length / k_sector_size);
     }
 
     free(fmp);
