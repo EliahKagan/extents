@@ -77,26 +77,28 @@ static void show_extents(FILE *const fp)
 {
     enum {
         sector_size = 512,
-        physical_width = 13, physical_short_width = 11,
-        width = 9, short_width = 7
+        physical_width = 13, physical_short_width = 10,
+        logical_width = 10, logical_short_width = 8,
+        length_width = 8, length_short_width = 6
     };
 
     struct fiemap *const fmp = get_fiemap(fileno(fp));
 
-    printf("%*s  %*s         %*s  %*s        %*s\n",
+    printf("%*s   %*s        %*s   %*s        %*s\n",
             physical_width, "PHYSICAL", physical_short_width, "",
-            width, "LOGICAL", short_width, "", width, "LENGTH");
+            logical_width, "LOGICAL", logical_short_width, "",
+            length_width, "LENGTH");
 
     for (__u32 i = 0u; i < fmp->fm_extent_count; ++i) {
         const struct fiemap_extent *const fep = &fmp->fm_extents[i];
 
-        printf("%*llu (%*llu sec.)   %*llu (%*llu sec.)   %*llu (%*llu sec.)\n",
+        printf("%*llu = %*llu sec.   %*llu = %*llu sec.   %*llu = %*llu sec.\n",
                 physical_width, fep->fe_physical,
                 physical_short_width, fep->fe_physical / sector_size,
-                width, fep->fe_logical,
-                short_width, fep->fe_logical / sector_size,
-                width, fep->fe_length,
-                short_width, fep->fe_length / sector_size);
+                logical_width, fep->fe_logical,
+                logical_short_width, fep->fe_logical / sector_size,
+                length_width, fep->fe_length,
+                length_short_width, fep->fe_length / sector_size);
     }
 
     free(fmp);
