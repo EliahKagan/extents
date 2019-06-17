@@ -12,8 +12,6 @@ all: fiemap
 
 fiemap.o: fiemap.c feature-test.h
 
-#fiemap: feature-test.h
-
 .PHONY: clean
 clean:
 	rm -f fiemap fiemap.o
