@@ -16,7 +16,7 @@ const char *progname(void);
 ATTRIBUTE((format(printf, 1, 2)))
 noreturn void die(const char *restrict format, ...);
 
-// TODO: add a GNU attribute to this to improve performance
+ATTRIBUTE((malloc, returns_nonnull))
 void *xcalloc(size_t count, size_t size);
 
 #endif // ! HAVE_IOCTL_1_FIEMAP_UTIL_H_
