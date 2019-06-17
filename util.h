@@ -10,11 +10,13 @@
 #include <stddef.h>
 #include <stdnoreturn.h>
 
+ATTRIBUTE((nonnull))
 void set_progname(const char *name);
 
+ATTRIBUTE((returns_nonnull))
 const char *progname(void);
 
-ATTRIBUTE((format(printf, 1, 2)))
+ATTRIBUTE((format(printf, 1, 2), nonnull(1)))
 noreturn void die(const char *restrict format, ...);
 
 ATTRIBUTE((malloc, returns_nonnull))
