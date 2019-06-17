@@ -1,6 +1,6 @@
 # Compiled binaries.
 /fiemap
-/fiemap.o
+/*.o
 
 # Precompiled headers.
 /.vscode/ipch/
