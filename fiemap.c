@@ -1,4 +1,4 @@
-// ioctl-1.c - Trying out FIEMAP ioctl. See:
+// fiemap.c - Trying out FIEMAP ioctl. See:
 //  - https://lwn.net/Articles/260803/ - documents FIEMAP as it was planned
 //  - https://lwn.net/Articles/287905/ - documents some important changes
 //  - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h
