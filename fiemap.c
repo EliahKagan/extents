@@ -35,24 +35,36 @@ static __u32 count_extents(const int fd)
     return fm.fm_mapped_extents;
 }
 
+// The number of extents may change between when they are counted and when the
+// count is used. This is a TOCTOU (time of check/time of use) race condition.
+// This checks that they still fit, and quits with an error if they don't.
+ATTRIBUTE((nonnull))
+static void ensure_extents_retrieved(const struct fiemap *const fmp)
+{
+    assert(fmp->fm_mapped_extents <= fmp->fm_extent_count);
+
+    if (fmp->fm_mapped_extents
+            && (fmp->fm_extents[fmp->fm_mapped_extents - 1u].fe_flags
+                & FIEMAP_EXTENT_LAST))
+        die("number of extents increased unexpectedly");
+}
+
 ATTRIBUTE((returns_nonnull))
 static struct fiemap *get_fiemap(const int fd)
 {
     const __u32 extent_count = count_extents(fd);
     struct fiemap *const fmp = alloc_fiemap(extent_count);
 
-    fmp->fm_start = 0;
-    fmp->fm_length = ~0ULL;
+    fmp->fm_start = 0uLL;
+    fmp->fm_length = ~0uLL;
     fmp->fm_extent_count = extent_count;
-    fmp->fm_flags = 0;
+    fmp->fm_flags = 0u;
 
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("ioctl error retrieving extents: %s", strerror(errno)); // TODO: does it set errno?
 
-    // Protect against UB due to TOCTOU race condition.
-    if (fmp->fm_mapped_extents != extent_count)
-        die("number of extents changed unexpectedly");
-
+    assert(fmp->fm_extent_count == extent_count); // See fiemap.h.
+    ensure_extents_retrieved(fmp);
     return fmp;
 }
 
