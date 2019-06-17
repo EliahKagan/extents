@@ -10,10 +10,6 @@
 #include <stddef.h>
 #include <stdnoreturn.h>
 
-// FIXME: Check if we actually use (and need) these macros.
-#define STR(a) #a
-#define XSTR(a) STR(a)
-
 ATTRIBUTE((nonnull))
 void set_progname(const char *name);
 

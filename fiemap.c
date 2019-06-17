@@ -20,9 +20,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define SYS_PATH_BUFLEN 1024
-#define SYS_PATH_PREFIX "/sys/dev/block/"
-
 enum filesystem_constants { k_sector_size = 512 };
 
 ATTRIBUTE((nonnull))
@@ -30,18 +27,26 @@ static __u64 get_offset(const int fd)
 {
     struct stat st = { 0 };
     if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
-    const int maj = major(st.st_dev), min = minor(st.st_dev);
+    const unsigned maj = major(st.st_dev), min = minor(st.st_dev);
 
     enum { bufsz = 1024 };
     char path[bufsz] = { 0 };
-    if (snprintf(path, bufsz, "/sys/dev/block/%d:%d", min, maj) >= bufsz)
+    if (snprintf(path, bufsz, "/sys/dev/block/%u:%u/start", min, maj) >= bufsz)
         die("internal error: sysfs path exceeds buffer");
 
     FILE *const sysfp = fopen(path, "r");
     if (!sysfp) die("can't open \"%s\": %s", path, strerror(errno));
-    __u64 offset = 0uLL;
-    if (fscanf(sysfp, "%llu%*c
 
+    __u64 offset_in_sectors = 0uLL;
+    char extra = '\0';
+    if (fscanf(sysfp, "%llu %c", &offset_in_sectors, &extra) != 1)
+        die("can't find offset: %s isn't (just) a number", path);
+
+    const __u64 offset = offset_in_sectors * k_sector_size;
+    printf("On block device %u:%u starting at %llu (sector %llu):\n",
+            maj, min, offset, offset_in_sectors);
+
+    return offset;
 }
 
 ATTRIBUTE((malloc, returns_nonnull))
