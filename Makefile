@@ -10,8 +10,12 @@ endif
 
 all: fiemap
 
-fiemap.o: fiemap.c feature-test.h
+fiemap: fiemap.o util.o
+
+fiemap.o: fiemap.c feature-test.h util.h
+
+util.o: util.c util.h feature-test.h
 
 .PHONY: clean
 clean:
-	rm -f fiemap fiemap.o
+	rm -f fiemap *.o

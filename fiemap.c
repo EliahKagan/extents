@@ -3,41 +3,17 @@
 //  - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h
 
 #include "feature-test.h"
+#include "util.h"
 
 #include <errno.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdnoreturn.h>
 #include <string.h>
 #include <linux/fiemap.h>
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 
 enum constants { k_sector_size = 512 };
-
-static const char *g_progname;
-
-static noreturn void die(const char *const format, ...)
-{
-    fprintf(stderr, "%s: error: ", g_progname);
-
-    va_list vlist;
-    va_start(vlist, format);
-    vfprintf(stderr, format, vlist);
-    va_end(vlist);
-
-    putc('\n', stderr);
-
-    exit(EXIT_FAILURE);
-}
-
-static void *xcalloc(const size_t count, const size_t size)
-{
-    void *const ret = calloc(count, size);
-    if (!ret) die("out of memory");
-    return ret;
-}
 
 static struct fiemap *alloc_fiemap(const __u32 extent_count)
 {
@@ -107,7 +83,7 @@ static void show_extents(FILE *const fp)
 
 int main(int argc, char **argv)
 {
-    g_progname = argv[0];
+    set_progname(argv[0]);
     if (argc < 2) die("too few arguments");
     if (argc > 2) die("too many arguments");
 
