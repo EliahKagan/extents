@@ -3,6 +3,7 @@
 //  - https://lwn.net/Articles/287905/ - documents some important changes
 //  - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h
 
+#include "attribute.h"
 #include "feature-test.h"
 #include "util.h"
 
@@ -17,6 +18,7 @@
 
 enum constants { k_sector_size = 512 };
 
+ATTRIBUTE((malloc, returns_nonnull))
 static struct fiemap *alloc_fiemap(const __u32 extent_count)
 {
     return xcalloc(1u, sizeof(struct fiemap)
@@ -33,6 +35,7 @@ static __u32 count_extents(const int fd)
     return fm.fm_mapped_extents;
 }
 
+ATTRIBUTE((returns_nonnull))
 static struct fiemap *get_fiemap(const int fd)
 {
     const __u32 extent_count = count_extents(fd);
@@ -53,6 +56,7 @@ static struct fiemap *get_fiemap(const int fd)
     return fmp;
 }
 
+ATTRIBUTE((nonnull))
 static void show_extents(FILE *const fp)
 {
     assert(fp);
