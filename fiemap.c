@@ -17,7 +17,7 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 
-enum constants { k_sector_size = 512 };
+enum filesystem_constants { k_sector_size = 512 };
 
 ATTRIBUTE((malloc, returns_nonnull))
 static struct fiemap *alloc_fiemap(const __u32 extent_count)
@@ -69,34 +69,41 @@ static struct fiemap *get_fiemap(const int fd)
     return fmp;
 }
 
+enum format_widths {
+    k_logical_width = 11, k_logical_short_width = 8,
+    k_physical_width = 13, k_physical_short_width = 10,
+    k_length_width = 9, k_length_short_width = 6
+};
+
+static void show_labels(void)
+{
+    printf("%*s     %*s   %*s     %*s   %*s\n",
+            k_logical_width, "LOGICAL", k_logical_short_width, "",
+            k_physical_width, "PHYSICAL", k_physical_short_width, "",
+            k_length_width, "LENGTH");
+}
+
 ATTRIBUTE((nonnull))
-static void show_extents(FILE *const fp)
+static void show_extent(const struct fiemap_extent *const fep)
+{
+    printf("%*llu B = %*llu   %*llu B = %*llu   %*llu B = %*llu\n",
+            k_logical_width, fep->fe_logical,
+            k_logical_short_width, fep->fe_logical / k_sector_size,
+            k_physical_width, fep->fe_physical,
+            k_physical_short_width, fep->fe_physical / k_sector_size,
+            k_length_width, fep->fe_length,
+            k_length_short_width, fep->fe_length / k_sector_size);
+}
+
+ATTRIBUTE((nonnull))
+static void show_all_extents(FILE *const fp)
 {
     assert(fp);
     struct fiemap *const fmp = get_fiemap(fileno(fp));
 
-    enum {
-        logical_width = 11, logical_short_width = 8,
-        physical_width = 13, physical_short_width = 10,
-        length_width = 9, length_short_width = 6
-    };
-
-    printf("%*s     %*s   %*s     %*s   %*s\n",
-            logical_width, "LOGICAL", logical_short_width, "",
-            physical_width, "PHYSICAL", physical_short_width, "",
-            length_width, "LENGTH");
-
-    for (__u32 i = 0u; i < fmp->fm_extent_count; ++i) {
-        const struct fiemap_extent *const fep = &fmp->fm_extents[i];
-
-        printf("%*llu B = %*llu   %*llu B = %*llu   %*llu B = %*llu\n",
-                logical_width, fep->fe_logical,
-                logical_short_width, fep->fe_logical / k_sector_size,
-                physical_width, fep->fe_physical,
-                physical_short_width, fep->fe_physical / k_sector_size,
-                length_width, fep->fe_length,
-                length_short_width, fep->fe_length / k_sector_size);
-    }
+    show_labels();
+    for (__u32 i = 0u; i < fmp->fm_extent_count; ++i)
+        show_extent(&fmp->fm_extents[i]);
 
     free(fmp);
 }
@@ -109,7 +116,7 @@ int main(int argc, char **argv)
 
     FILE *const fp = fopen(argv[1], "rb");
     if (!fp) die("can't open \"%s\": %s", argv[1], strerror(errno));
-    show_extents(fp);
+    show_all_extents(fp);
     fclose(fp);
 
     return EXIT_SUCCESS;
