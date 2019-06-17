@@ -18,6 +18,7 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 enum filesystem_constants { k_sector_size = 512 };
 
@@ -26,6 +27,8 @@ static __u64 get_offset(const int fd)
 {
     struct stat st =  { 0 };
     if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
+    const int maj = major(st.st_dev), min = minor(st.st_dev);
+    printf("major=%d, minor=%d\n", maj, min);
 
     return 0LL; // FIXME: implement the rest of the function instead
 }
