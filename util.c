@@ -18,6 +18,7 @@ void set_progname(const char *const name)
 
 const char *progname(void)
 {
+    assert(g_progname);
     return g_progname;
 }
 
