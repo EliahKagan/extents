@@ -1,5 +1,6 @@
-CFLAGS += -std=c11 -fsanitize=address,undefined -g
-LDFLAGS += -fsanitize=address,undefined
+sanitizers := -fsanitize=address,undefined
+CFLAGS += $(sanitizers) -std=c11 -g
+LDFLAGS += $(sanitizers)
 
 ifeq ($(CC),clang-9)
 	CFLAGS += -Weverything -Wno-disabled-macro-expansion
