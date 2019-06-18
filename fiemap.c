@@ -82,7 +82,6 @@ static void ensure_extents_retrieved(const struct fiemap *const fmp)
         die("extent count just increased!");
 }
 
-ATTRIBUTE((returns_nonnull))
 static struct fiemap *get_fiemap(const int fd)
 {
     const __u32 extent_count = count_extents(fd);
