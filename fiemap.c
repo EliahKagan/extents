@@ -37,12 +37,12 @@ static __u64 get_offset(const int fd)
         die("internal error: sysfs path exceeds buffer");
 
     FILE *const sysfp = fopen(path, "r");
-    if (!sysfp) die("can't open \"%s\": %s", path, strerror(errno));
+    if (!sysfp) die("%s: %s", path, strerror(errno));
 
     __u64 offset_in_sectors = 0uLL;
     char extra = '\0';
     if (fscanf(sysfp, "%llu %c", &offset_in_sectors, &extra) != 1)
-        die("can't find offset: %s isn't (just) a number", path);
+        die("can't interpret %s as offset", path);
 
     const __u64 offset = offset_in_sectors * k_sector_size;
     printf("On block device %u:%u starting at %llu (sector %llu):\n",
@@ -63,7 +63,7 @@ static __u32 count_extents(const int fd)
     struct fiemap fm = { .fm_length = ULLONG_MAX, .fm_extent_count = 0 };
 
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
-        die("ioctl error counting extents: %s", strerror(errno)); // TODO: does it set errno?
+        die("can't count  extents: %s", strerror(errno)); // TODO: does it set errno?
 
     return fm.fm_mapped_extents;
 }
@@ -80,7 +80,7 @@ static void ensure_extents_retrieved(const struct fiemap *const fmp)
     if (fmp->fm_mapped_extents
             && !(fmp->fm_extents[fmp->fm_mapped_extents - 1u].fe_flags
                  & FIEMAP_EXTENT_LAST))
-        die("number of extents increased unexpectedly");
+        die("extent count just increased!");
 }
 
 ATTRIBUTE((returns_nonnull))
@@ -95,7 +95,7 @@ static struct fiemap *get_fiemap(const int fd)
     fmp->fm_flags = 0u;
 
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
-        die("ioctl error retrieving extents: %s", strerror(errno)); // TODO: does it set errno?
+        die("can't retrieve extents: %s", strerror(errno)); // TODO: does it set errno?
 
     assert(fmp->fm_extent_count == extent_count); // See fiemap.h.
     ensure_extents_retrieved(fmp);
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
     if (argc > 2) die("too many arguments");
 
     FILE *const fp = fopen(argv[1], "rb");
-    if (!fp) die("can't open \"%s\": %s", argv[1], strerror(errno));
+    if (!fp) die("%s: %s", argv[1], strerror(errno));
     show_all_extents(fileno(fp));
     fclose(fp);
 
