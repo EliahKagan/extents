@@ -135,16 +135,20 @@ static void show_all_extents(const struct fiemap *const fmp,
     assert(fmp);
 
     show_labels();
-    
     for (__u32 i = 0u; i < fmp->fm_mapped_extents; ++i)
         show_extent(&fmp->fm_extents[i], offset);
 }
 
-ATTRIBUTE((nonnull(1)))
+ATTRIBUTE((nonnull))
 static __u64 sum_extents(const struct fiemap *const fmp)
 {
-    __u64 sum = 0uLL;
+    assert(fmp);
 
+    __u64 sum = 0uLL;
+    for (__u32 i = 0u; i < fmp->fm_mapped_extents; ++i)
+        sum += fmp->fm_extents[i].fe_length;
+
+    return sum;
 }
 
 ATTRIBUTE((nonnull(1)))
