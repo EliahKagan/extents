@@ -129,8 +129,8 @@ static void show_extent(const struct fiemap_extent *const fep,
 }
 
 ATTRIBUTE((nonnull(1)))
-static void show_all_extents(const struct fiemap *const fmp,
-                             const __u64 offset)
+static void show_extent_Table(const struct fiemap *const fmp,
+                              const __u64 offset)
 {
     assert(fmp);
 
@@ -155,17 +155,25 @@ ATTRIBUTE((nonnull(1)))
 static void show_end(const struct fiemap *const fmp, const off_t size)
 {
     assert(fmp);
+    assert(size >= 0);
 
-    if (size < 0) {
+
+}
+
+ATTRIBUTE((nonnull(1)))
+static void show_interpretaion_guide(const struct fiemap *const fmp,
+                                     const off_t size)
+{
+    assert(fmp);
+
+    if (size < 0)
         die("file has negative size %lld", (long long)size);
-    }
-    else if (fmp->fm_mapped_extents) {
-    }
-    else if (size) {
+    else if (fmp->fm_mapped_extents)
+        show_end(fmp, size);
+    else if (size)
         printf("Size is %llu, but there are no extents!\n", (__u64)size);
-    } else {
+    else
         puts("There are no extents.");
-    }
 }
 
 static void show_extent_info(const int fd)
@@ -176,8 +184,8 @@ static void show_extent_info(const int fd)
     const __u64 offset = get_offset(st.st_dev);
     struct fiemap *const fmp = get_fiemap(fd);
     
-    show_all_extents(fmp, offset);
-    show_end(fmp, st.st_size);
+    show_extent_table(fmp, offset);
+    show_interpretation_guide(fmp, st.st_size);
 
     free(fmp);
 }
