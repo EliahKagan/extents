@@ -2,6 +2,9 @@
 /fiemap
 /*.o
 
+# Output of manually running the Clang analyzer.
+/*.plist
+
 # Precompiled headers
 /.vscode/ipch/
 
