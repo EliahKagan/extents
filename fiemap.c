@@ -152,12 +152,17 @@ static __u64 sum_extents(const struct fiemap *const fmp)
 }
 
 ATTRIBUTE((nonnull(1)))
-static void show_end(const struct fiemap *const fmp, const off_t size)
+static void show_end(const struct fiemap *const fmp, const __u64 real_size)
 {
     assert(fmp);
-    assert(size >= 0);
+    assert(fmp->fm_mapped_extents);
 
+    const __u64 sum = sum_extents(fmp);
+    printf("File is %lld bytes. Extents sum to %lld bytes.\n", real_size, sum);
 
+    // FIXME: handle cases that seem impossible (I think they're possible)
+
+    // FIXME: print report of how many bytes the file goes into the last extent
 }
 
 ATTRIBUTE((nonnull(1)))
@@ -169,9 +174,9 @@ static void show_interpretaion_guide(const struct fiemap *const fmp,
     if (size < 0)
         die("file has negative size %lld", (long long)size);
     else if (fmp->fm_mapped_extents)
-        show_end(fmp, size);
+        show_end(fmp, (__u64)size);
     else if (size)
-        printf("Size is %llu, but there are no extents!\n", (__u64)size);
+        printf("Size is %llu, but there are no extents!\n", (long long)size);
     else
         puts("There are no extents.");
 }
