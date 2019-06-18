@@ -24,7 +24,6 @@ enum filesystem_constants { k_sector_size = 512 };
 
 // Prints major and minor device numbers and where the device seeems to start.
 // Returns where the device seems to start.
-ATTRIBUTE((nonnull))
 static __u64 get_offset(const int fd)
 {
     struct stat st = { 0 };
