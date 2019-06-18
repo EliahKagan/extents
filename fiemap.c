@@ -45,7 +45,7 @@ static __u64 get_offset(const int fd)
         die("can't interpret %s as offset", path);
 
     const __u64 offset = offset_in_sectors * k_sector_size;
-    printf("On block device %u:%u starting at %llu (sector %llu):\n",
+    printf("On block device %u:%u, which starts at %llu (sector %llu):\n",
             maj, min, offset, offset_in_sectors);
 
     return offset;
