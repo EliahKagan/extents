@@ -63,7 +63,7 @@ static __u32 count_extents(const int fd)
     struct fiemap fm = { .fm_length = ULLONG_MAX, .fm_extent_count = 0 };
 
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
-        die("can't count extents: %s", strerror(errno)); // TODO: does it set errno?
+        die("can't count extents: %s", strerror(errno));
 
     return fm.fm_mapped_extents;
 }
@@ -95,7 +95,7 @@ static struct fiemap *get_fiemap(const int fd)
     fmp->fm_flags = 0u;
 
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
-        die("can't retrieve extents: %s", strerror(errno)); // TODO: does it set errno?
+        die("can't retrieve extents: %s", strerror(errno));
 
     assert(fmp->fm_extent_count == extent_count); // See fiemap.h.
     ensure_extents_retrieved(fmp);
