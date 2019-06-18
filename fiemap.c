@@ -114,7 +114,7 @@ enum format_widths {
 
 static void show_labels(void)
 {
-    printf("%*s     %*s   %*s     %*s   %*s\n",
+    printf("\n%*s     %*s   %*s     %*s   %*s\n",
             k_logical_width, "LOGICAL", k_logical_short_width, "",
             k_physical_width, "PHYSICAL", k_physical_short_width, "",
             k_length_width, "LENGTH");
@@ -168,11 +168,11 @@ static void show_end(const struct fiemap *const fmp, const __u64 real_size)
     const __u64 sum = sum_extents(fmp);
     
     if (sum < real_size) {
-        die("file is %llu bytes; extents only sum to %llu bytes",
+        die("file is %llu bytes; extents only use %llu bytes",
                 real_size, sum);
     }
 
-    printf("File is %llu bytes. Extents sum to %llu bytes.\n", real_size, sum);
+    printf("%llu-byte file has %llu bytes of extents.\n", real_size, sum);
 
     const __u64 unused = sum - real_size;
     const __u64 last_length = last_extent(fmp)->fe_length;
@@ -182,7 +182,7 @@ static void show_end(const struct fiemap *const fmp, const __u64 real_size)
                 unused, last_length);
     }
 
-    printf("%llu of %llu bytes used in the last extent.\n",
+    printf("Last extent has %llu/%llu bytes used.\n",
             last_length - unused, last_length);
 }
 
@@ -191,6 +191,8 @@ static void show_interpretation_guide(const struct fiemap *const fmp,
                                       const off_t size)
 {
     assert(fmp);
+
+    putchar('\n');
 
     if (size < 0)
         die("file has negative size %lld", (long long)size);
