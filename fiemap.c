@@ -96,7 +96,7 @@ static struct fiemap *get_fiemap(const int fd)
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("can't retrieve extents: %s", strerror(errno));
 
-    assert(fmp->fm_extent_count == extent_count); // See fiemap.h.
+    assert(fmp->fm_extent_count == extent_count); // See fiemap.h in Linux.
     ensure_extents_retrieved(fmp);
     return fmp;
 }
