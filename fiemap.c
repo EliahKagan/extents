@@ -24,11 +24,9 @@ enum filesystem_constants { k_sector_size = 512 };
 
 // Prints major and minor device numbers and where the device seeems to start.
 // Returns where the device seems to start.
-static __u64 get_offset(const int fd)
+static __u64 get_offset(const dev_t dev)
 {
-    struct stat st = { 0 };
-    if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
-    const unsigned maj = major(st.st_dev), min = minor(st.st_dev);
+    const unsigned maj = major(dev), min = minor(dev);
 
     enum { bufsz = 1024 };
     char path[bufsz] = { 0 };
@@ -130,15 +128,52 @@ static void show_extent(const struct fiemap_extent *const fep,
             k_length_short_width, fep->fe_length / k_sector_size);
 }
 
-ATTRIBUTE((nonnull))
-static void show_all_extents(const int fd)
+ATTRIBUTE((nonnull(1)))
+static void show_all_extents(const struct fiemap *const fmp,
+                             const __u64 offset)
 {
-    const __u64 offset = get_offset(fd);
-    struct fiemap *const fmp = get_fiemap(fd);
+    assert(fmp);
 
     show_labels();
+    
     for (__u32 i = 0u; i < fmp->fm_mapped_extents; ++i)
         show_extent(&fmp->fm_extents[i], offset);
+}
+
+ATTRIBUTE((nonnull(1)))
+static __u64 sum_extents(const struct fiemap *const fmp)
+{
+    __u64 sum = 0uLL;
+
+}
+
+ATTRIBUTE((nonnull(1)))
+static void show_end(const struct fiemap *const fmp, const off_t size)
+{
+    assert(fmp);
+
+    if (size < 0) {
+        die("file has negative size %lld", (long long)size);
+    }
+    else if (fmp->fm_mapped_extents) {
+    }
+    else if (size) {
+        printf("Size is %llu, but there are no extents!\n", (__u64)size);
+    } else {
+        puts("There are no extents.");
+    }
+}
+
+static void show_extent_info(const int fd)
+{
+    struct stat st = { 0 };
+    if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
+
+    const __u64 offset = get_offset(st.st_dev);
+    struct fiemap *const fmp = get_fiemap(fd);
+    
+    show_all_extents(fmp, offset);
+    show_end(fmp, st.st_size);
 
     free(fmp);
 }
@@ -151,7 +186,7 @@ int main(int argc, char **argv)
 
     FILE *const fp = fopen(argv[1], "rb");
     if (!fp) die("%s: %s", argv[1], strerror(errno));
-    show_all_extents(fileno(fp));
+    show_extent_info(fileno(fp));
     fclose(fp);
 
     return EXIT_SUCCESS;
