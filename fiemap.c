@@ -63,7 +63,7 @@ static __u32 count_extents(const int fd)
     struct fiemap fm = { .fm_length = ULLONG_MAX, .fm_extent_count = 0 };
 
     if (ioctl(fd, FS_IOC_FIEMAP, &fm) != 0)
-        die("can't count  extents: %s", strerror(errno)); // TODO: does it set errno?
+        die("can't count extents: %s", strerror(errno)); // TODO: does it set errno?
 
     return fm.fm_mapped_extents;
 }
