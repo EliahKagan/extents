@@ -65,6 +65,14 @@ static __u32 count_extents(const int fd)
     return fm.fm_mapped_extents;
 }
 
+ATTRIBUTE((nonnull, returns_nonnull))
+static const struct fiemap_extent *last_extent(const struct fiemap *const fmp)
+{
+    assert(fmp);
+    assert(fmp->fm_mapped_extents);
+    return &fmp->fm_extents[fmp->fm_mapped_extents - 1u];
+}
+
 // The number of extents may change between when they are counted and when the
 // count is used. This is a TOCTOU (time of check/time of use) race condition.
 // This checks that they still fit, and quits with an error if they don't.
@@ -75,11 +83,11 @@ static void ensure_extents_retrieved(const struct fiemap *const fmp)
     assert(fmp->fm_mapped_extents <= fmp->fm_extent_count);
 
     if (fmp->fm_mapped_extents
-            && !(fmp->fm_extents[fmp->fm_mapped_extents - 1u].fe_flags
-                 & FIEMAP_EXTENT_LAST))
+            && !(last_extent(fmp)->fe_flags & FIEMAP_EXTENT_LAST))
         die("extent count just increased!");
 }
 
+ATTRIBUTE((returns_nonnull))
 static struct fiemap *get_fiemap(const int fd)
 {
     const __u32 extent_count = count_extents(fd);
@@ -93,7 +101,7 @@ static struct fiemap *get_fiemap(const int fd)
     if (ioctl(fd, FS_IOC_FIEMAP, fmp) != 0)
         die("can't retrieve extents: %s", strerror(errno));
 
-    assert(fmp->fm_extent_count == extent_count); // See fiemap.h in Linux.
+    assert(fmp->fm_extent_count == extent_count); // See <linux/fiemap.h>.
     ensure_extents_retrieved(fmp);
     return fmp;
 }
@@ -129,7 +137,7 @@ static void show_extent(const struct fiemap_extent *const fep,
 }
 
 ATTRIBUTE((nonnull(1)))
-static void show_extent_Table(const struct fiemap *const fmp,
+static void show_extent_table(const struct fiemap *const fmp,
                               const __u64 offset)
 {
     assert(fmp);
@@ -158,16 +166,29 @@ static void show_end(const struct fiemap *const fmp, const __u64 real_size)
     assert(fmp->fm_mapped_extents);
 
     const __u64 sum = sum_extents(fmp);
-    printf("File is %lld bytes. Extents sum to %lld bytes.\n", real_size, sum);
+    
+    if (sum < real_size) {
+        die("file is %llu bytes; extents only sum to %llu bytes",
+                real_size, sum);
+    }
 
-    // FIXME: handle cases that seem impossible (I think they're possible)
+    printf("File is %llu bytes. Extents sum to %llu bytes.\n", real_size, sum);
 
-    // FIXME: print report of how many bytes the file goes into the last extent
+    const __u64 unused = sum - real_size;
+    const __u64 last_length = last_extent(fmp)->fe_length;
+
+    if (last_length < unused) {
+        die("unused space (%llu bytes) exceeds last extent (%llu bytes)",
+                unused, last_length);
+    }
+
+    printf("%llu of %llu bytes used in the last extent.\n",
+            last_length - unused, last_length);
 }
 
 ATTRIBUTE((nonnull(1)))
-static void show_interpretaion_guide(const struct fiemap *const fmp,
-                                     const off_t size)
+static void show_interpretation_guide(const struct fiemap *const fmp,
+                                      const off_t size)
 {
     assert(fmp);
 
