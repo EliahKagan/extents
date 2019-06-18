@@ -33,7 +33,7 @@ static __u64 get_offset(const int fd)
     enum { bufsz = 1024 };
     char path[bufsz] = { 0 };
     if (snprintf(path, bufsz, "/sys/dev/block/%u:%u/start", maj, min) >= bufsz)
-        die("internal error: sysfs path exceeds buffer");
+        die("sysfs path exceeds buffer (this is a bug!)");
 
     FILE *const sysfp = fopen(path, "r");
     if (!sysfp) die("%s: %s", path, strerror(errno));
