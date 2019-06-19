@@ -172,19 +172,20 @@ static void show_end(const struct fiemap *const fmp, const __u64 real_size)
                 real_size, sum);
     }
 
-    printf("%llu/%llu bytes used.", real_size, sum);
+    printf("%llu/%llu bytes used", real_size, sum);
 
     const __u64 unused = sum - real_size;
     const __u64 last_length = last_extent(fmp)->fe_length;
 
     if (last_length < unused) {
-        putchar('\n');
+        puts("."); // Finish the last message before quitting with an error.
 
         die("unused space (%llu bytes) exceeds last extent (%llu bytes)",
                 unused, last_length);
     }
 
-    printf(" %llu/%llu in last extent.\n", last_length - unused, last_length);
+    printf(", %llu/%llu in the last extent.\n",
+            last_length - unused, last_length);
 }
 
 ATTRIBUTE((nonnull(1)))
