@@ -200,7 +200,7 @@ static void show_interpretation_guide(const struct fiemap *const fmp,
     else if (fmp->fm_mapped_extents)
         show_end(fmp, (__u64)size);
     else if (size)
-        printf("Size is %llu, but there are no extents!\n", (long long)size);
+        die("size is %llu bytes but there are no extents", (long long)size);
     else
         puts("There are no extents.");
 }
