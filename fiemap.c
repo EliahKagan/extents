@@ -22,6 +22,14 @@
 
 enum filesystem_constants { k_sector_size = 512 };
 
+ATTRIBUTE((nonnull, returns_nonnull))
+static FILE *open_file(const char *const path)
+{
+    FILE *const fp = fopen(path, "rb");
+    if (!fp) die("%s: %s", path, strerror(errno));
+    return fp;
+}
+
 // Prints major and minor device numbers and where the device seeems to start.
 // Returns where the device seems to start.
 static __u64 get_offset(const dev_t dev)
@@ -226,10 +234,7 @@ int main(int argc, char **argv)
     if (argc < 2) die("too few arguments");
     if (argc > 2) die("too many arguments");
 
-    FILE *const fp = fopen(argv[1], "rb");
-    if (!fp) die("%s: %s", argv[1], strerror(errno));
+    FILE *const fp = (strcmp(argv[1], "-") == 0 ? stdin : open_file(argv[1]));
     show_extent_info(fileno(fp));
-    fclose(fp);
-
-    return EXIT_SUCCESS;
+    if (fp != stdin) fclose(fp);
 }
