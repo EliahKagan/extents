@@ -25,6 +25,8 @@ enum filesystem_constants { k_sector_size = 512 };
 ATTRIBUTE((nonnull, returns_nonnull))
 static FILE *open_file(const char *const path)
 {
+    assert(path);
+
     FILE *const fp = fopen(path, "rb");
     if (!fp) die("%s: %s", path, strerror(errno));
     return fp;
