@@ -13,10 +13,14 @@ all: fiemap
 
 fiemap: fiemap.o util.o
 
-fiemap.o: fiemap.c feature-test.h attribute.h util.h
-
-util.o: util.c util.h attribute.h feature-test.h
-
 .PHONY: clean
 clean:
 	rm -f fiemap *.o
+
+depend: .depend
+
+.depend: *.c
+	rm -f ./.depend
+	$(CC) $(CFLAGS) -MM $^ >./.depend;
+
+include .depend

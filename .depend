@@ -1,0 +1,2 @@
+fiemap.o: fiemap.c feature-test.h attribute.h util.h
+util.o: util.c util.h feature-test.h attribute.h
