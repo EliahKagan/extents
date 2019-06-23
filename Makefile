@@ -13,11 +13,7 @@ srcs = $(wildcard *.c)
 objs = $(srcs:.c=.o)
 deps = $(srcs:.c=.d)
 
-all: fiemap
-
 fiemap: $(objs)
-	# FIXME: Do we even need to write anything in this rule?
-	$(CC) $^ -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
