@@ -9,18 +9,21 @@ else
 	CFLAGS += -pedantic-errors -Wall -Wextra
 endif
 
+srcs = $(wildcard *.c)
+objs = $(srcs:.c=.o)
+deps = $(srcs:.c=.d)
+
 all: fiemap
 
-fiemap: fiemap.o util.o
+fiemap: $(objs)
+	# FIXME: Do we even need to write anything in this rule?
+	$(CC) $^ -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 .PHONY: clean
 clean:
-	rm -f fiemap *.o
+	$(RM) fiemap $(objs) $(deps)
 
-depend: .depend
-
-.depend: *.c
-	rm -f ./.depend
-	$(CC) $(CFLAGS) -MM $^ >./.depend;
-
-include .depend
+-include $(deps)
