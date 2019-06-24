@@ -2,7 +2,10 @@
 /fiemap
 /*.o
 
-# Output of manually running the Clang analyzer.
+# Automatically generated makefile dependency files
+/*.d
+
+# Output of manually running the Clang analyzer
 /*.plist
 
 # Precompiled headers
