@@ -1,12 +1,12 @@
 sanitizers := -fsanitize=address,undefined
-CFLAGS += $(sanitizers) -std=c11 -g
+CFLAGS += $(sanitizers) -std=c11 -g -pedantic-errors
 LDFLAGS += $(sanitizers)
 
 # FIXME: Check for compilers matching /^clang(-|$)/ -- not just clang-9.
 ifeq ($(CC),clang-9)
 	CFLAGS += -Weverything -Wno-disabled-macro-expansion
 else
-	CFLAGS += -pedantic-errors -Wall -Wextra
+	CFLAGS += -Wall -Wextra
 endif
 
 srcs = $(wildcard *.c)
