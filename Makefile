@@ -16,7 +16,7 @@ deps = $(srcs:.c=.d)
 fiemap: $(objs)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+	$(CC) $(CFLAGS) -MMD -MP -c $<
 
 .PHONY: clean
 clean:
