@@ -1,5 +1,5 @@
 sanitizers := -fsanitize=address,undefined
-CFLAGS += $(sanitizers) -std=c11 -g -pedantic-errors
+CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
 LDFLAGS += $(sanitizers)
 
 # FIXME: Check for compilers matching /^clang(-|$)/ -- not just clang-9.
