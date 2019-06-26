@@ -18,6 +18,7 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <sys/types.h>
 
 enum filesystem_constants { k_sector_size = 512 };
@@ -176,7 +177,7 @@ static void show_end(const struct fiemap *const fmp, const __u64 real_size)
     assert(fmp->fm_mapped_extents);
 
     const __u64 sum = sum_extents(fmp);
-    
+
     if (sum < real_size) {
         die("file is %llu bytes; extents only use %llu bytes",
                 real_size, sum);
@@ -223,7 +224,7 @@ static void show_extent_info(const int fd)
 
     const __u64 offset = get_offset(st.st_dev);
     struct fiemap *const fmp = get_fiemap(fd);
-    
+
     show_extent_table(fmp, offset);
     show_interpretation_guide(fmp, st.st_size);
 
