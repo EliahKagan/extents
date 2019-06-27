@@ -2,8 +2,7 @@ sanitizers := -fsanitize=address,undefined
 CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
 LDFLAGS += $(sanitizers)
 
-# FIXME: Check for compilers matching /^clang(-|$)/ -- not just clang-9.
-ifeq ($(CC),clang-9)
+ifeq ($(shell ./is-clang $(CC)),yes)
 	CFLAGS += -Weverything -Wno-disabled-macro-expansion
 else
 	CFLAGS += -Wall -Wextra

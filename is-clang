@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+    printf 'Usage:  %s NAME\n' "$0"
+    exit 1
+fi
+
+if printf '%s' "$1" | grep -qE '^clang(-|$)'; then
+    echo yes
+else
+    echo no
+fi
