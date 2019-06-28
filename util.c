@@ -1,4 +1,4 @@
-// util.c - utility functions
+// util.c - utility functions (implementation)
 
 #include "util.h"
 

@@ -1,4 +1,4 @@
-// filesystem.c - implementation of general filesystem access functions
+// filesystem.c - general filesystem access functions (implementation)
 
 #include "filesystem.h"
 #include "util.h"

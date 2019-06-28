@@ -1,4 +1,4 @@
-// util.h - interface to utility functions
+// util.h - utility functions
 
 #ifndef HAVE_IOCTL_1_FIEMAP_UTIL_H_
 #define HAVE_IOCTL_1_FIEMAP_UTIL_H_
