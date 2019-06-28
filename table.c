@@ -48,7 +48,7 @@ static inline int measure(const __u64 value)
 {
     enum { bufsz = 256 };
     char buf[bufsz] = { 0 };
-    return sprintf(buf, "%lld", value);
+    return sprintf(buf, "%llu", value);
 }
 
 void populate_widths(struct tablespec *const tsp)
