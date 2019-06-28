@@ -44,9 +44,26 @@ static inline __u64 get(const struct fiemap *const fmp,
     return (raw + csp->offset) / csp->divisor;
 }
 
+static inline int measure(const __u64 value)
+{
+    enum { bufsz = 256 };
+    char buf[bufsz] = { 0 };
+    return sprintf(buf, "%lld", value);
+}
+
 void populate_widths(struct tablespec *const tsp)
 {
+    assert(tsp && tsp->gap_width > 0 && tsp->col_count >= 0);
 
+    const __u32 row_count = tsp->fmp->fm_mapped_extents;
+
+    for (__u32 row_index = 0u; row_index <= row_count; ++row_index) {
+        for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
+            struct colspec *const csp = &tsp->cols[col_index];
+            const __u64 value = get(tsp->fmp, csp, row_index);
+            csp->width = max(csp->width, measure(value));
+        }
+    }
 }
 
 ATTRIBUTE((nonnull))
@@ -66,7 +83,7 @@ static void show_labels(const struct tablespec *const tsp)
 ATTRIBUTE((nonnull))
 static void show_all_rows(const struct tablespec *const tsp)
 {
-    assert(tsp);
+    assert(tsp && tsp->gap_width > 0 && tsp->col_count >= 0);
 
     const __u32 row_count = tsp->fmp->fm_mapped_extents;
 

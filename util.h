@@ -22,4 +22,10 @@ noreturn void die(const char *restrict format, ...);
 ATTRIBUTE((malloc, returns_nonnull))
 void *xcalloc(size_t count, size_t size);
 
+ATTRIBUTE((const))
+inline max(const int first, const int second)
+{
+    return second > first ? second : first;
+}
+
 #endif // ! HAVE_IOCTL_1_FIEMAP_UTIL_H_

@@ -43,3 +43,5 @@ void *xcalloc(const size_t count, const size_t size)
     if (!ret) die("out of memory");
     return ret;
 }
+
+extern inline max(int first, int second);
