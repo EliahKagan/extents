@@ -24,11 +24,15 @@ struct colspec {
 struct tablespec {
     const struct fiemap *fmp;
     __u64 offset;
+    int gap;
     size_t ncols;
     struct colspec cols[];
 };
 
-ATTRIBUTE((nonnull(1)))
-void show_extent_table(const struct fiemap *const fmp, const __u64 offset);
+ATTRIBUTE((nonnull))
+void populate_widths(struct tablespec *const tsp);
+
+ATTRIBUTE((nonnull))
+void show_extent_table(const struct tablespec *const tsp);
 
 #endif // ! HAVE_IOCTL_1_FIEMAP_TABLE_H_
