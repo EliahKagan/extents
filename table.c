@@ -16,8 +16,13 @@ struct tablespec *alloc_tablespec(const int col_count)
 {
     assert(col_count >= 0);
 
-    return xcalloc(1u, sizeof(struct tablespec)
-                        + sizeof(struct colspec) * (size_t)col_count);
+    struct tablespec *const tsp =
+            xcalloc(1u, sizeof(struct tablespec)
+                            + sizeof(struct colspec) * (size_t)col_count);
+
+    tsp->col_count = col_count;
+
+    return tsp;
 }
 
 ATTRIBUTE((nonnull))
