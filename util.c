@@ -44,4 +44,4 @@ void *xcalloc(const size_t count, const size_t size)
     return ret;
 }
 
-extern inline max(int first, int second);
+extern inline int max(int first, int second);

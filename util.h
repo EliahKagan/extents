@@ -23,7 +23,7 @@ ATTRIBUTE((malloc, returns_nonnull))
 void *xcalloc(size_t count, size_t size);
 
 ATTRIBUTE((const))
-inline max(const int first, const int second)
+inline int max(const int first, const int second)
 {
     return second > first ? second : first;
 }
