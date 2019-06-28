@@ -6,11 +6,10 @@
 #include "feature-test.h"
 
 #include "attribute.h"
-#include "filesystem.h"
+#include "constants.h"
 #include "table.h"
 #include "util.h"
 
-// FIXME: Now that this file has been split, can some of these be removed?
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -21,7 +20,48 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <sys/sysmacros.h>
 #include <sys/types.h>
+
+ATTRIBUTE((nonnull, returns_nonnull))
+static FILE *open_file(const char *const path)
+{
+    assert(path);
+
+    FILE *const fp = fopen(path, "rb");
+    if (!fp) die("%s: %s", path, strerror(errno));
+    return fp;
+}
+
+// Prints major and minor device numbers and where the device seeems to start.
+// Returns where the device seems to start.
+static __u64 get_offset(const dev_t dev)
+{
+    const unsigned maj = major(dev), min = minor(dev);
+
+    enum
+    {
+        bufsz = 1024
+    };
+    char path[bufsz] = {0};
+    if (snprintf(path, bufsz, "/sys/dev/block/%u:%u/start", maj, min) >= bufsz)
+        die("sysfs path exceeds buffer (this is a bug!)");
+
+    FILE *const sysfp = fopen(path, "r");
+    if (!sysfp)
+        die("%s: %s", path, strerror(errno));
+
+    __u64 offset_in_sectors = 0uLL;
+    char extra = '\0';
+    if (fscanf(sysfp, "%llu %c", &offset_in_sectors, &extra) != 1)
+        die("can't interpret %s as offset", path);
+
+    const __u64 offset = offset_in_sectors * k_sector_size;
+    printf("On block device %u:%u, which starts at byte %llu (sector %llu):\n",
+           maj, min, offset, offset_in_sectors);
+
+    return offset;
+}
 
 ATTRIBUTE((malloc, returns_nonnull))
 static struct fiemap *alloc_fiemap(const __u32 extent_count)
