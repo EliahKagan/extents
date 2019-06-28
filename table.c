@@ -44,13 +44,6 @@ static inline __u64 get(const struct fiemap *const fmp,
     return (raw + csp->offset) / csp->divisor;
 }
 
-static inline int measure(const __u64 value)
-{
-    enum { bufsz = 256 };
-    char buf[bufsz] = { 0 };
-    return sprintf(buf, "%llu", value);
-}
-
 void populate_widths(struct tablespec *const tsp)
 {
     assert(tsp && tsp->gap_width > 0 && tsp->col_count >= 0);
@@ -61,7 +54,7 @@ void populate_widths(struct tablespec *const tsp)
         for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
             struct colspec *const csp = &tsp->cols[col_index];
             const __u64 value = get(tsp->fmp, csp, row_index);
-            csp->width = max(csp->width, measure(value));
+            csp->width = max(csp->width, snprintf(NULL, 0u, "%llu", value));
         }
     }
 }
