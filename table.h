@@ -36,6 +36,6 @@ ATTRIBUTE((nonnull))
 void populate_widths(struct tablespec *tsp);
 
 ATTRIBUTE((nonnull))
-void show_extent_table(const struct tablespec *tsp);
+void show_table(const struct tablespec *tsp);
 
 #endif // ! HAVE_IOCTL_1_FIEMAP_TABLE_H_
