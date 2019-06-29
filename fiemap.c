@@ -127,7 +127,7 @@ static void show_extent_table(const struct fiemap *const fmp,
 {
     struct tablespec *const tsp = alloc_tablespec(3);
     tsp->fmp = fmp;
-    tsp->gap_width = 2;
+    tsp->gap_width = 3;
 
     tsp->cols[0].label = "LOGICAL (sectors)";
     tsp->cols[0].field = field_logical;
