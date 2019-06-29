@@ -44,14 +44,18 @@ ATTRIBUTE((nonnull))
 static inline __u64 get(const struct fiemap *const fmp,
                         const struct colspec *const csp, const __u32 row_index)
 {
-    assert(fmp && csp && row_index < fmp->fm_mapped_extents);
+    assert(fmp);
+    assert(csp);
+    assert(row_index < fmp->fm_mapped_extents);
+
     const __u64 raw = get_raw(&fmp->fm_extents[row_index], csp->field);
     return (raw + csp->offset) / csp->divisor;
 }
 
 void populate_widths(struct tablespec *const tsp)
 {
-    assert(tsp && tsp->gap_width > 0 && tsp->col_count >= 0);
+    assert(tsp);
+    assert(tsp->gap_width > 0 && tsp->col_count >= 0);
 
     const __u32 row_count = tsp->fmp->fm_mapped_extents;
 
@@ -67,7 +71,8 @@ void populate_widths(struct tablespec *const tsp)
 ATTRIBUTE((nonnull))
 static void show_labels(const struct tablespec *const tsp)
 {
-    assert(tsp && tsp->gap_width > 0 && tsp->col_count >= 0);
+    assert(tsp);
+    assert(tsp->gap_width > 0 && tsp->col_count >= 0);
 
     for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
         const struct colspec *const csp = &tsp->cols[col_index];
@@ -81,7 +86,8 @@ static void show_labels(const struct tablespec *const tsp)
 ATTRIBUTE((nonnull))
 static void show_all_rows(const struct tablespec *const tsp)
 {
-    assert(tsp && tsp->gap_width > 0 && tsp->col_count >= 0);
+    assert(tsp);
+    assert(tsp->gap_width > 0 && tsp->col_count >= 0);
 
     const __u32 row_count = tsp->fmp->fm_mapped_extents;
 
