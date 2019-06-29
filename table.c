@@ -59,7 +59,7 @@ void populate_widths(struct tablespec *const tsp)
 
     const __u32 row_count = tsp->fmp->fm_mapped_extents;
 
-    for (__u32 row_index = 0u; row_index <= row_count; ++row_index) {
+    for (__u32 row_index = 0u; row_index < row_count; ++row_index) {
         for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
             struct colspec *const csp = &tsp->cols[col_index];
             const __u64 value = get(tsp->fmp, csp, row_index);
@@ -91,7 +91,7 @@ static void show_all_rows(const struct tablespec *const tsp)
 
     const __u32 row_count = tsp->fmp->fm_mapped_extents;
 
-    for (__u32 row_index = 0u; row_index <= row_count; ++row_index) {
+    for (__u32 row_index = 0u; row_index < row_count; ++row_index) {
         for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
             const struct colspec *const csp = &tsp->cols[col_index];
             const __u64 value = get(tsp->fmp, csp, row_index);
