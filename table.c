@@ -60,7 +60,7 @@ static void set_widths_from_labels(struct tablespec *const tsp)
     assert(tsp->col_count >= 0);
 
     for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
-        const struct colspec *const csp = &tsp->cols[col_index];
+        struct colspec *const csp = &tsp->cols[col_index];
         assert(csp->label);
         csp->width = strlen(csp->label);
     }
@@ -86,7 +86,7 @@ static void update_widths_from_values(struct tablespec *const tsp)
 void populate_widths(struct tablespec *const tsp)
 {
     assert(tsp);
-    set_widths_from_lables(tsp);
+    set_widths_from_labels(tsp);
     update_widths_from_values(tsp);
 }
 
