@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <linux/fiemap.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
@@ -52,10 +53,24 @@ static inline __u64 get(const struct fiemap *const fmp,
     return (raw + csp->offset) / csp->divisor;
 }
 
-void populate_widths(struct tablespec *const tsp)
+ATTRIBUTE((nonnull))
+static void set_widths_from_labels(struct tablespec *const tsp)
 {
     assert(tsp);
-    assert(tsp->gap_width > 0 && tsp->col_count >= 0);
+    assert(tsp->col_count >= 0);
+
+    for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
+        const struct colspec *const csp = &tsp->cols[col_index];
+        assert(csp->label);
+        csp->width = strlen(csp->label);
+    }
+}
+
+ATTRIBUTE((nonnull))
+static void update_widths_from_values(struct tablespec *const tsp)
+{
+    assert(tsp);
+    assert(tsp->col_count >= 0);
 
     const __u32 row_count = tsp->fmp->fm_mapped_extents;
 
@@ -66,6 +81,13 @@ void populate_widths(struct tablespec *const tsp)
             csp->width = max(csp->width, snprintf(NULL, 0u, "%llu", value));
         }
     }
+}
+
+void populate_widths(struct tablespec *const tsp)
+{
+    assert(tsp);
+    set_widths_from_lables(tsp);
+    update_widths_from_values(tsp);
 }
 
 ATTRIBUTE((nonnull))
