@@ -129,17 +129,17 @@ static void show_extent_table(const struct fiemap *const fmp,
     tsp->fmp = fmp;
     tsp->gap_width = 2;
 
-    tsp->cols[0].label = "LOGICAL"; // LOGICAL (sectors)
+    tsp->cols[0].label = "LO"; // LOGICAL (sectors)
     tsp->cols[0].field = field_logical;
     tsp->cols[0].offset = 0uLL;
     tsp->cols[0].divisor = k_sector_size;
 
-    tsp->cols[1].label = "PHYSICAL"; // PHYSICAL (sectors)
+    tsp->cols[1].label = "PH"; // PHYSICAL (sectors)
     tsp->cols[1].field = field_physical;
     tsp->cols[1].offset = offset;
     tsp->cols[1].divisor = k_sector_size;
 
-    tsp->cols[2].label = "LENGTH"; // LENGTH (sectors)
+    tsp->cols[2].label = "LE"; // LENGTH (sectors)
     tsp->cols[2].field = field_length;
     tsp->cols[2].offset = 0uLL;
     tsp->cols[2].divisor = k_sector_size;
