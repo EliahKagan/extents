@@ -54,7 +54,6 @@ static inline __u64 get(const struct fiemap *const fmp,
     return (raw + csp->offset) / csp->divisor;
 }
 
-
 ATTRIBUTE((nonnull))
 static void set_widths_from_labels(struct tablespec *const tsp)
 {
