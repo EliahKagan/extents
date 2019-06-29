@@ -7,6 +7,7 @@
 #include "util.h"
 
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include <linux/fiemap.h>
@@ -53,6 +54,7 @@ static inline __u64 get(const struct fiemap *const fmp,
     return (raw + csp->offset) / csp->divisor;
 }
 
+
 ATTRIBUTE((nonnull))
 static void set_widths_from_labels(struct tablespec *const tsp)
 {
@@ -62,7 +64,10 @@ static void set_widths_from_labels(struct tablespec *const tsp)
     for (int col_index = 0; col_index < tsp->col_count; ++col_index) {
         struct colspec *const csp = &tsp->cols[col_index];
         assert(csp->label);
-        csp->width = strlen(csp->label);
+
+        const size_t width = strlen(csp->label);
+        if (width > (size_t)INT_MAX) die("label too big to format (bug!)");
+        csp->width = (int)width;
     }
 }
 
