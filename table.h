@@ -12,7 +12,11 @@
 #include <linux/types.h>
 #include <sys/ioctl.h>
 
-enum field { field_logical, field_physical, field_length };
+enum field {
+    field_logical,
+    field_physical,
+    field_length,
+    field_physical_end };
 
 struct colspec {
     const char *label;

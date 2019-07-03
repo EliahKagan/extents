@@ -34,9 +34,10 @@ static inline __u64 get_raw(const struct fiemap_extent *const fep,
     assert(fep);
 
     switch (field) {
-        case field_logical:     return fep->fe_logical;
-        case field_physical:    return fep->fe_physical;
-        case field_length:      return fep->fe_length;
+        case field_logical:         return fep->fe_logical;
+        case field_physical:        return fep->fe_physical;
+        case field_length:          return fep->fe_length;
+        case field_physical_end:    return fep->fe_physical + fep->fe_length;
     }
 
     die("unrecognized field type (bug!)");
