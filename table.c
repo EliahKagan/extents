@@ -40,7 +40,7 @@ static inline __u64 get_raw(const struct fiemap_extent *const fep,
         case datum_physical_end:    return fep->fe_physical + fep->fe_length;
     }
 
-    die("unrecognized datum type (bug!)");
+    die(BUG("unrecognized datum selection"));
 }
 
 ATTRIBUTE((nonnull))
@@ -66,7 +66,7 @@ static void set_widths_from_labels(struct tablespec *const tsp)
         assert(csp->label);
 
         const size_t width = strlen(csp->label);
-        if (width > (size_t)INT_MAX) die("label too big to format (bug!)");
+        if (width > (size_t)INT_MAX) die(BUG("label too big to format"));
         csp->width = (int)width;
     }
 }

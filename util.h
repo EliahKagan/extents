@@ -10,6 +10,8 @@
 #include <stddef.h>
 #include <stdnoreturn.h>
 
+#define BUG(format) format " (this is a bug!)"
+
 ATTRIBUTE((nonnull))
 void set_progname(const char *name);
 
