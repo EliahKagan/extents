@@ -29,18 +29,18 @@ struct tablespec *alloc_tablespec(const int col_count)
 
 ATTRIBUTE((nonnull))
 static inline __u64 get_raw(const struct fiemap_extent *const fep,
-                            const enum field field)
+                            const enum datum datum)
 {
     assert(fep);
 
-    switch (field) {
-        case field_logical:         return fep->fe_logical;
-        case field_physical:        return fep->fe_physical;
-        case field_length:          return fep->fe_length;
-        case field_physical_end:    return fep->fe_physical + fep->fe_length;
+    switch (datum) {
+        case datum_logical:         return fep->fe_logical;
+        case datum_physical:        return fep->fe_physical;
+        case datum_length:          return fep->fe_length;
+        case datum_physical_end:    return fep->fe_physical + fep->fe_length;
     }
 
-    die("unrecognized field type (bug!)");
+    die("unrecognized datum type (bug!)");
 }
 
 ATTRIBUTE((nonnull))
@@ -51,7 +51,7 @@ static inline __u64 get(const struct fiemap *const fmp,
     assert(csp);
     assert(row_index < fmp->fm_mapped_extents);
 
-    const __u64 raw = get_raw(&fmp->fm_extents[row_index], csp->field);
+    const __u64 raw = get_raw(&fmp->fm_extents[row_index], csp->datum);
     return (raw + csp->offset) / csp->divisor;
 }
 

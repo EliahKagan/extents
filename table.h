@@ -12,16 +12,16 @@
 #include <linux/types.h>
 #include <sys/ioctl.h>
 
-enum field {
-    field_logical,
-    field_physical,
-    field_length,
-    field_physical_end };
+enum datum {
+    datum_logical,
+    datum_physical,
+    datum_length,
+    datum_physical_end };
 
 struct colspec {
     const char *label;
     int width;
-    enum field field;
+    enum datum datum;
     __u64 offset;
     __u64 divisor;
 };
