@@ -135,17 +135,17 @@ static void show_extent_table(const struct fiemap *const fmp,
     tsp->cols[0].offset = 0uLL;
     tsp->cols[0].divisor = k_sector_size;
 
-    tsp->cols[1].label = "FIRST (sec)";
+    tsp->cols[1].label = "INITIAL (sec)";
     tsp->cols[1].datum = datum_physical;
     tsp->cols[1].offset = offset;
     tsp->cols[1].divisor = k_sector_size;
 
-    tsp->cols[2].label = "LAST (sec)";
+    tsp->cols[2].label = "FINAL (sec)";
     tsp->cols[2].datum = datum_physical_end;
     tsp->cols[2].offset = offset - 1u;
     tsp->cols[2].divisor = k_sector_size;
 
-    tsp->cols[3].label = "LENGTH (sec)";
+    tsp->cols[3].label = "COUNT (sec)";
     tsp->cols[3].datum = datum_length;
     tsp->cols[3].offset = 0uLL;
     tsp->cols[3].divisor = k_sector_size;
