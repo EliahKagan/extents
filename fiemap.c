@@ -123,9 +123,10 @@ static struct fiemap *get_fiemap(const int fd)
 // Currently this is just the length of the string, because the user specifies
 // each column using a single character, with no extraneous characters allowed.
 ATTRIBUTE((nonnull))
-static inline int count_columns(const char *const columns)
+static int count_columns(const char *const columns)
 {
     ASSERT_NONNEGATIVE_INT_FITS_IN_SIZE_T();
+    assert(columns);
 
     const size_t count = strlen(columns);
 
@@ -136,76 +137,87 @@ static inline int count_columns(const char *const columns)
 }
 
 ATTRIBUTE((nonnull))
-static void show_extent_table(const struct fiemap *const fmp,
-                              const __u64 offset, const char *const columns)
+static void specify_column(struct colspec *const colp,
+                           const __u64 offset, const char column)
+{
+    assert(colp);
+
+    switch (column) {
+    case 'l':
+        colp->label = "LOGICAL (B)";
+        colp->datum = datum_logical;
+        colp->offset = 0uLL;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'L':
+        colp->label = "LOGICAL (sec)";
+        colp->datum = datum_logical;
+        colp->offset = 0uLL;
+        colp->divisor = k_sector_size;
+        break;
+
+    case 'i':
+        colp->label = "INITIAL (B)";
+        colp->datum = datum_physical;
+        colp->offset = offset;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'I':
+        colp->label = "INITIAL (sec)";
+        colp->datum = datum_physical;
+        colp->offset = offset;
+        colp->divisor = k_sector_size;
+        break;
+
+    case 'f':
+        colp->label = "FINAL (B)";
+        colp->datum = datum_physical_end;
+        colp->offset = offset - 1uLL;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'F':
+        colp->label = "FINAL (sec)";
+        colp->datum = datum_physical_end;
+        colp->offset = offset - 1uLL;
+        colp->divisor = k_sector_size;
+        break;
+
+    case 'c':
+        colp->label = "COUNT (B)";
+        colp->datum = datum_length;
+        colp->offset = 0uLL;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'C':
+        colp->label = "COUNT (sec)";
+        colp->datum = datum_length;
+        colp->offset = 0uLL;
+        colp->divisor = k_sector_size;
+        break;
+
+    default:
+        die("unrecognized column specifier \"%c\"", column);
+    }
+}
+
+ATTRIBUTE((nonnull))
+void show_extent_table(const struct fiemap *const fmp, const __u64 offset,
+                       const char *const columns)
 {
     enum { gap_width = 3 }; // TODO: Let the user customize this.
+    assert(fmp);
+    assert(columns);
 
     struct tablespec *const tsp = alloc_tablespec(count_columns(columns));
     tsp->fmp = fmp;
     tsp->gap_width = gap_width;
 
-    for (int i = 0; i < tsp->col_count; ++i) {
-        struct colspec *const colp = &tsp->cols[i];
-
-        switch (columns[i]) {
-        case 'l':
-            colp->label = "LOGICAL (B)";
-            colp->datum = datum_logical;
-            colp->offset = 0uLL;
-            colp->divisor = 1uLL;
-            break;
-
-        case 'L':
-            colp->label = "LOGICAL (sec)";
-            colp->datum = datum_logical;
-            colp->offset = 0uLL;
-            colp->divisor = k_sector_size;
-            break;
-
-        case 'i':
-            colp->label = "INITIAL (B)";
-            colp->datum = datum_physical;
-            colp->offset = offset;
-            colp->divisor = 1uLL;
-            break;
-
-        case 'I':
-            colp->label = "INITIAL (sec)";
-            colp->datum = datum_physical;
-            colp->offset = offset;
-            colp->divisor = k_sector_size;
-            break;
-
-        case 'f':
-            colp->label = "FINAL (B)";
-            colp->datum = datum_physical_end;
-            colp->offset = offset - 1uLL;
-            colp->divisor = 1uLL;
-            break;
-
-        case 'F':
-            colp->label = "FINAL (sec)";
-            colp->datum = datum_physical_end;
-            colp->offset = offset - 1uLL;
-            colp->divisor = k_sector_size;
-            break;
-
-        case 'c':
-            colp->label = "COUNT (B)";
-            colp->datum = datum_length;
-            colp->offset = 0uLL;
-            colp->divisor = 1uLL;
-            break;
-
-        case 'C':
-            colp->label = "COUNT (sec)";
-            colp->datum = datum_length;
-            colp->offset = 0uLL;
-            colp->divisor = k_sector_size;
-            break;
-        }
-    }
+    for (int i = 0; i < tsp->col_count; ++i)
+        specify_column(&tsp->cols[i], offset, columns[i]);
 
     populate_widths(tsp);
     show_table(tsp);
