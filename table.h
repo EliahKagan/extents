@@ -34,13 +34,8 @@ struct tablespec {
     struct colspec cols[];
 };
 
-ATTRIBUTE((malloc, returns_nonnull))
-struct tablespec *alloc_tablespec(int col_count);
-
 ATTRIBUTE((nonnull))
-void populate_widths(struct tablespec *tsp);
-
-ATTRIBUTE((nonnull))
-void show_table(const struct tablespec *tsp);
+void show_extent_table(const struct fiemap *fmp, const __u64 offset,
+                       const char *columns);
 
 #endif // ! HAVE_IOCTL_1_FIEMAP_TABLE_H_

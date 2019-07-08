@@ -14,7 +14,8 @@
 #include <linux/types.h>
 #include <sys/ioctl.h>
 
-struct tablespec *alloc_tablespec(const int col_count)
+ATTRIBUTE((malloc, returns_nonnull))
+static struct tablespec *alloc_tablespec(const int col_count)
 {
     ASSERT_NONNEGATIVE_INT_FITS_IN_SIZE_T();
 
@@ -90,7 +91,8 @@ static void update_widths_from_values(struct tablespec *const tsp)
     }
 }
 
-void populate_widths(struct tablespec *const tsp)
+ATTRIBUTE((nonnull))
+static void populate_widths(struct tablespec *const tsp)
 {
     assert(tsp);
     set_widths_from_labels(tsp);
@@ -131,9 +133,113 @@ static void show_all_rows(const struct tablespec *const tsp)
     }
 }
 
-void show_table(const struct tablespec *const tsp)
+ATTRIBUTE((nonnull))
+static void show_populated_table(const struct tablespec *const tsp)
 {
     assert(tsp);
     show_labels(tsp);
     show_all_rows(tsp);
+}
+
+// Currently this is just the length of the string, because the user specifies
+// each column using a single character, with no extraneous characters allowed.
+ATTRIBUTE((nonnull))
+static int count_columns(const char *const columns)
+{
+    ASSERT_NONNEGATIVE_INT_FITS_IN_SIZE_T();
+    assert(columns);
+
+    const size_t count = strlen(columns);
+
+    if (count > (size_t)INT_MAX)
+        die("you want more than %d columns?", INT_MAX);
+
+    return (int)count;
+}
+
+ATTRIBUTE((nonnull))
+static void specify_column(struct colspec *const colp,
+                           const __u64 offset, const char column)
+{
+    assert(colp);
+
+    switch (column) {
+    case 'l':
+        colp->label = "LOGICAL (B)";
+        colp->datum = datum_logical;
+        colp->offset = 0uLL;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'L':
+        colp->label = "LOGICAL (sec)";
+        colp->datum = datum_logical;
+        colp->offset = 0uLL;
+        colp->divisor = k_sector_size;
+        break;
+
+    case 'i':
+        colp->label = "INITIAL (B)";
+        colp->datum = datum_physical;
+        colp->offset = offset;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'I':
+        colp->label = "INITIAL (sec)";
+        colp->datum = datum_physical;
+        colp->offset = offset;
+        colp->divisor = k_sector_size;
+        break;
+
+    case 'f':
+        colp->label = "FINAL (B)";
+        colp->datum = datum_physical_end;
+        colp->offset = offset - 1uLL;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'F':
+        colp->label = "FINAL (sec)";
+        colp->datum = datum_physical_end;
+        colp->offset = offset - 1uLL;
+        colp->divisor = k_sector_size;
+        break;
+
+    case 'c':
+        colp->label = "COUNT (B)";
+        colp->datum = datum_length;
+        colp->offset = 0uLL;
+        colp->divisor = 1uLL;
+        break;
+
+    case 'C':
+        colp->label = "COUNT (sec)";
+        colp->datum = datum_length;
+        colp->offset = 0uLL;
+        colp->divisor = k_sector_size;
+        break;
+
+    default:
+        die("unrecognized column specifier \"%c\"", column);
+    }
+}
+
+void show_extent_table(const struct fiemap *const fmp, const __u64 offset,
+                       const char *const columns)
+{
+    enum { gap_width = 3 }; // TODO: Let the user customize this.
+    assert(fmp);
+    assert(columns);
+
+    struct tablespec *const tsp = alloc_tablespec(count_columns(columns));
+    tsp->fmp = fmp;
+    tsp->gap_width = gap_width;
+
+    for (int i = 0; i < tsp->col_count; ++i)
+        specify_column(&tsp->cols[i], offset, columns[i]);
+
+    populate_widths(tsp);
+    show_populated_table(tsp);
+    free(tsp);
 }
