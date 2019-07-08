@@ -120,35 +120,92 @@ static struct fiemap *get_fiemap(const int fd)
     return fmp;
 }
 
-// FIXME: Replace this with something that uses configuration information,
-//        read from command-line options, to show a user-customized table.
+// Currently this is just the length of the string, because the user specifies
+// each column using a single character, with no extraneous characters allowed.
+ATTRIBUTE((nonnull))
+static inline int count_columns(const char *const columns)
+{
+    ASSERT_NONNEGATIVE_INT_FITS_IN_SIZE_T();
+
+    const size_t count = strlen(columns);
+
+    if (count > (size_t)INT_MAX)
+        die("you want more than %d columns?", INT_MAX);
+
+    return (int)count;
+}
+
 ATTRIBUTE((nonnull))
 static void show_extent_table(const struct fiemap *const fmp,
-                              const __u64 offset)
+                              const __u64 offset, const char *const columns)
 {
-    struct tablespec *const tsp = alloc_tablespec(4);
+    enum { gap_width = 3 }; // TODO: Let the user customize this.
+
+    struct tablespec *const tsp = alloc_tablespec(count_columns(columns));
     tsp->fmp = fmp;
-    tsp->gap_width = 3;
+    tsp->gap_width = gap_width;
 
-    tsp->cols[0].label = "LOGICAL (sec)";
-    tsp->cols[0].datum = datum_logical;
-    tsp->cols[0].offset = 0uLL;
-    tsp->cols[0].divisor = k_sector_size;
+    for (int i = 0; i < tsp->col_count; ++i) {
+        struct colspec *const colp = &tsp->cols[i];
 
-    tsp->cols[1].label = "INITIAL (sec)";
-    tsp->cols[1].datum = datum_physical;
-    tsp->cols[1].offset = offset;
-    tsp->cols[1].divisor = k_sector_size;
+        switch (columns[i]) {
+        case 'l':
+            colp->label = "LOGICAL (B)";
+            colp->datum = datum_logical;
+            colp->offset = 0uLL;
+            colp->divisor = 1uLL;
+            break;
 
-    tsp->cols[2].label = "FINAL (sec)";
-    tsp->cols[2].datum = datum_physical_end;
-    tsp->cols[2].offset = offset - 1u;
-    tsp->cols[2].divisor = k_sector_size;
+        case 'L':
+            colp->label = "LOGICAL (sec)";
+            colp->datum = datum_logical;
+            colp->offset = 0uLL;
+            colp->divisor = k_sector_size;
+            break;
 
-    tsp->cols[3].label = "COUNT (sec)";
-    tsp->cols[3].datum = datum_length;
-    tsp->cols[3].offset = 0uLL;
-    tsp->cols[3].divisor = k_sector_size;
+        case 'i':
+            colp->label = "INITIAL (B)";
+            colp->datum = datum_physical;
+            colp->offset = offset;
+            colp->divisor = 1uLL;
+            break;
+
+        case 'I':
+            colp->label = "INITIAL (sec)";
+            colp->datum = datum_physical;
+            colp->offset = offset;
+            colp->divisor = k_sector_size;
+            break;
+
+        case 'f':
+            colp->label = "FINAL (B)";
+            colp->datum = datum_physical_end;
+            colp->offset = offset - 1uLL;
+            colp->divisor = 1uLL;
+            break;
+
+        case 'F':
+            colp->label = "FINAL (sec)";
+            colp->datum = datum_physical_end;
+            colp->offset = offset - 1uLL;
+            colp->divisor = k_sector_size;
+            break;
+
+        case 'c':
+            colp->label = "COUNT (B)";
+            colp->datum = datum_length;
+            colp->offset = 0uLL;
+            colp->divisor = 1uLL;
+            break;
+
+        case 'C':
+            colp->label = "COUNT (sec)";
+            colp->datum = datum_length;
+            colp->offset = 0uLL;
+            colp->divisor = k_sector_size;
+            break;
+        }
+    }
 
     populate_widths(tsp);
     show_table(tsp);
@@ -222,7 +279,7 @@ static void show_extent_info(const int fd)
     const __u64 offset = get_offset(st.st_dev);
     struct fiemap *const fmp = get_fiemap(fd);
 
-    show_extent_table(fmp, offset);
+    show_extent_table(fmp, offset, "LIFC");
     show_interpretation_guide(fmp, st.st_size);
 
     free(fmp);

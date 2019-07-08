@@ -16,6 +16,8 @@
 
 struct tablespec *alloc_tablespec(const int col_count)
 {
+    ASSERT_NONNEGATIVE_INT_FITS_IN_SIZE_T();
+
     assert(col_count >= 0);
 
     struct tablespec *const tsp =
