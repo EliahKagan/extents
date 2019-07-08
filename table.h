@@ -16,7 +16,8 @@ enum datum {
     datum_logical,
     datum_physical,
     datum_length,
-    datum_physical_end };
+    datum_physical_end
+};
 
 struct colspec {
     const char *label;
