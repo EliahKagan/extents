@@ -222,6 +222,8 @@ static void specify_column(struct colspec *const colp,
         break;
 
     default:
+        // FIXME: Do an earlier check when the column specifier comes from the
+        //        user, and keep this check but make it a BUG message.
         die("unrecognized column specifier \"%c\"", column);
     }
 }
