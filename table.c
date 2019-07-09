@@ -165,56 +165,56 @@ static void specify_column(struct colspec *const colp,
     assert(colp);
 
     switch (column) {
-    case 'l':
+    case 'L':
         colp->label = "LOGICAL (B)";
         colp->datum = datum_logical;
         colp->offset = 0uLL;
         colp->divisor = 1uLL;
         break;
 
-    case 'L':
+    case 'l':
         colp->label = "LOGICAL (sec)";
         colp->datum = datum_logical;
         colp->offset = 0uLL;
         colp->divisor = k_sector_size;
         break;
 
-    case 'i':
+    case 'I':
         colp->label = "INITIAL (B)";
         colp->datum = datum_physical;
         colp->offset = offset;
         colp->divisor = 1uLL;
         break;
 
-    case 'I':
+    case 'i':
         colp->label = "INITIAL (sec)";
         colp->datum = datum_physical;
         colp->offset = offset;
         colp->divisor = k_sector_size;
         break;
 
-    case 'f':
+    case 'F':
         colp->label = "FINAL (B)";
         colp->datum = datum_physical_end;
         colp->offset = offset - 1uLL;
         colp->divisor = 1uLL;
         break;
 
-    case 'F':
+    case 'f':
         colp->label = "FINAL (sec)";
         colp->datum = datum_physical_end;
         colp->offset = offset - 1uLL;
         colp->divisor = k_sector_size;
         break;
 
-    case 'c':
+    case 'C':
         colp->label = "COUNT (B)";
         colp->datum = datum_length;
         colp->offset = 0uLL;
         colp->divisor = 1uLL;
         break;
 
-    case 'C':
+    case 'c':
         colp->label = "COUNT (sec)";
         colp->datum = datum_length;
         colp->offset = 0uLL;

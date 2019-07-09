@@ -14,7 +14,7 @@
 
 #define ASSERT_NONNEGATIVE_INT_FITS_IN_SIZE_T() \
     static_assert(sizeof(int) <= sizeof(size_t), \
-        "I want to convert safely between ints >= 0 and size_ts <= INT_MAX")
+        "I want to convert safely between ints >= 0 and size_ts <= INT_MAX.")
 
 ATTRIBUTE((nonnull))
 void set_progname(const char *name);

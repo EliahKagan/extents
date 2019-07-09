@@ -187,7 +187,7 @@ static void show_extent_info(const int fd)
     const __u64 offset = get_offset(st.st_dev);
     struct fiemap *const fmp = get_fiemap(fd);
 
-    show_extent_table(fmp, offset, "LIFC");
+    show_extent_table(fmp, offset, "lifc");
     show_interpretation_guide(fmp, st.st_size);
 
     free(fmp);
