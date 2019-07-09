@@ -38,10 +38,10 @@ static inline __u64 get_raw(const struct fiemap_extent *const fep,
     assert(fep);
 
     switch (datum) {
-        case datum_logical:         return fep->fe_logical;
-        case datum_physical:        return fep->fe_physical;
-        case datum_length:          return fep->fe_length;
-        case datum_physical_end:    return fep->fe_physical + fep->fe_length;
+        case k_datum_logical:         return fep->fe_logical;
+        case k_datum_physical:        return fep->fe_physical;
+        case k_datum_length:          return fep->fe_length;
+        case k_datum_physical_end:    return fep->fe_physical + fep->fe_length;
     }
 
     die(BUG("unrecognized datum selection"));
@@ -167,56 +167,56 @@ static void specify_column(struct colspec *const colp,
     switch (column) {
     case 'L':
         colp->label = "LOGICAL (B)";
-        colp->datum = datum_logical;
+        colp->datum = k_datum_logical;
         colp->offset = 0uLL;
         colp->divisor = 1uLL;
         break;
 
     case 'l':
         colp->label = "LOGICAL (sec)";
-        colp->datum = datum_logical;
+        colp->datum = k_datum_logical;
         colp->offset = 0uLL;
         colp->divisor = k_sector_size;
         break;
 
     case 'I':
         colp->label = "INITIAL (B)";
-        colp->datum = datum_physical;
+        colp->datum = k_datum_physical;
         colp->offset = offset;
         colp->divisor = 1uLL;
         break;
 
     case 'i':
         colp->label = "INITIAL (sec)";
-        colp->datum = datum_physical;
+        colp->datum = k_datum_physical;
         colp->offset = offset;
         colp->divisor = k_sector_size;
         break;
 
     case 'F':
         colp->label = "FINAL (B)";
-        colp->datum = datum_physical_end;
+        colp->datum = k_datum_physical_end;
         colp->offset = offset - 1uLL;
         colp->divisor = 1uLL;
         break;
 
     case 'f':
         colp->label = "FINAL (sec)";
-        colp->datum = datum_physical_end;
+        colp->datum = k_datum_physical_end;
         colp->offset = offset - 1uLL;
         colp->divisor = k_sector_size;
         break;
 
     case 'C':
         colp->label = "COUNT (B)";
-        colp->datum = datum_length;
+        colp->datum = k_datum_length;
         colp->offset = 0uLL;
         colp->divisor = 1uLL;
         break;
 
     case 'c':
         colp->label = "COUNT (sec)";
-        colp->datum = datum_length;
+        colp->datum = k_datum_length;
         colp->offset = 0uLL;
         colp->divisor = k_sector_size;
         break;

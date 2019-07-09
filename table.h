@@ -13,10 +13,10 @@
 #include <sys/ioctl.h>
 
 enum datum {
-    datum_logical,      // "LOGICAL"
-    datum_physical,     // "INITIAL"
-    datum_length,       // "COUNT"
-    datum_physical_end  // "FINAL"
+    k_datum_logical,      // "LOGICAL"
+    k_datum_physical,     // "INITIAL"
+    k_datum_length,       // "COUNT"
+    k_datum_physical_end  // "FINAL"
 };
 
 struct colspec {
