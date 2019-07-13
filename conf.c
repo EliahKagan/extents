@@ -77,6 +77,46 @@ static const struct option k_longopts[] = {
 #define GETOPT(ac, av) (getopt_long(ac, av, k_shortopts, k_longopts, NULL))
 #endif
 
+static noreturn void die_unrecognized_option(char *const *const argv)
+{
+    if (optopt)
+        die("unrecognized option: -%c", optopt);
+    else if (k_accept_longopts != (0))
+        die("unrecognized option: %s", argv[optind - 1]);
+    else
+        die(BUG("unrecognized option diagnostic failed"));
+}
+
+static void process_option(char *const *restrict const argv, const int opt,
+                           struct conf *restrict const cp)
+{
+    switch (opt) {
+    case 't':
+        cp->columns = optarg;
+        break;
+
+    case 'B':
+        cp->columns = COLUMNS_DEFAULT_IN_BYTES;
+        break;
+
+    case 's':
+        cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
+        break;
+
+    case 'h':
+        show_help_and_quit();
+
+    case ':':
+        die("missing operand for -%c option", optopt);
+
+    case '?':
+        die_unrecognized_option(argv);
+
+    default:
+        die(BUG("getopt() returned %d '%c'"), opt, opt);
+    }
+}
+
 // Reads options (and their operands) from the command-line arguments and
 // returns a string of table column specifiers.
 int get_table_configuration(int argc, char *const *restrict const argv,
@@ -92,38 +132,8 @@ int get_table_configuration(int argc, char *const *restrict const argv,
     cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
 
     opterr = false;
-    for (int opt = 0; (opt = GETOPT(argc, argv)) != -1; ) {
-        switch (opt) {
-        case 't':
-            cp->columns = optarg;
-            break;
-
-        case 'B':
-            cp->columns = COLUMNS_DEFAULT_IN_BYTES;
-            break;
-
-        case 's':
-            cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
-            break;
-
-        case 'h':
-            show_help_and_quit();
-
-        case ':':
-            die("missing operand for -%c option", optopt);
-
-        case '?':
-            if (optopt)
-                die("unrecognized option: -%c", optopt);
-            else if (k_accept_longopts != (0))
-                die("unrecognized option: %s", argv[optind - 1]);
-            else
-                die(BUG("unrecognized option diagnostic failed"));
-
-        default:
-            die(BUG("getopt() returned %d '%c'"), opt, opt);
-        }
-    }
+    for (int opt = 0; (opt = GETOPT(argc, argv)) != -1; )
+        process_option(argv, opt, cp);
 
     return optind - 1;
 }
