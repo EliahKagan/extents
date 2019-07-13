@@ -10,9 +10,21 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifndef NO_LONGOPTS
+#include <getopt.h>
+#endif
+
 // The table's column defaults are LOGICAL, INITIAL, FINAL, COUNT.
 #define COLUMNS_DEFAULT_IN_SECTORS "lifc"
 #define COLUMNS_DEFAULT_IN_BYTES "LIFC"
+
+enum compile_time_longopts_configuration {
+#ifdef NO_LONGOPTS
+    k_accept_longopts = 0
+#else
+    k_accept_longopts = 1
+#endif
+};
 
 // Like it says on the tin. Prints a help message and exits indicating success.
 static noreturn void show_help_and_quit(void)
@@ -22,35 +34,51 @@ static noreturn void show_help_and_quit(void)
     printf("  %s -B PATH\n", progname());
     printf("  %s -s PATH\n\n", progname());
 
-#ifdef NO_LONGOPTS
-    puts("The -t option specifies a full list of columns as follows:\n");
-#else
-    puts("The -t (--table) option specifies a full list of columns as"
-            " follows:\n");
-#endif
+    if (k_accept_longopts == (0)) {
+        puts("The -t option specifies a full list of columns as follows:\n");
+    } else {
+        puts("The -t (--table) option specifies a full list of columns as"
+                " follows:\n");
+    }
 
     puts("  l or L   logical offset in file, in sectors (l) or bytes (L)");
     puts("  i or I   initial block on disk, in sectors (i) or bytes (I)");
     puts("  f or F   final block on disk, in sectors (f) or bytes (F)");
     puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)\n");
 
-#ifdef NO_LONGOPTS
-    puts("The -B option means -t LIFC.");
-    puts("The -s option means -t lifc, which is the default.\n");
-#else
-    puts("The -B (--bytes) option means -t LIFC.");
-    puts("The -s (--sectors) option means -t lifc, which is the default.\n");
-#endif
+    if (k_accept_longopts == (0)) {
+        puts("The -B option means -t LIFC.");
+        puts("The -s option means -t lifc, which is the default.\n");
+    } else {
+        puts("The -B (--bytes) option means -t LIFC.");
+        puts("The -s (--sectors) option means -t lifc, which is the"
+                " default.\n");
+    }
 
     puts("Mutliple column specifications don't combine. The last one wins.");
 
     exit(EXIT_SUCCESS);
 }
 
+static const char *const k_shortopts = ":t:Bsh";
+
+#ifdef NO_LONGOPTS
+#define GETOPT(ac, av) (getopt(ac, av, k_shortopts))
+#else
+static const struct option k_longopts[] = {
+    // FIXME: write the non-last elements
+    { 0 }
+};
+
+#define GETOPT(ac, av) (getopt_long(ac, av, k_shortopts, k_longopts, NULL))
+#endif
+
+// Reads options (and their operands) from the command-line arguments and
+// returns a string of table column specifiers.
 int get_table_configuration(int argc, char *const *restrict const argv,
                             struct conf *restrict const cp)
 {
-    // TODO: Maybe refactor this function into multiple functions.
+    // TOOD: Maybe extract some parts of this function into other functions.
     assert(argc > 0);
     assert(argv);
     assert(cp);
@@ -59,10 +87,8 @@ int get_table_configuration(int argc, char *const *restrict const argv,
 
     cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
 
-    // TODO: Maybe support long options. But I'm unsure whether wise to use
-    //       getopt_long(); musl compatibility remains a goal for this program.
     opterr = false;
-    for (int opt = 0; (opt = getopt(argc, argv, ":t:Bsh")) != -1; ) {
+    for (int opt = 0; (opt = GETOPT(argc, argv)) != -1; ) {
         switch (opt) {
         case 't':
             cp->columns = optarg;
@@ -83,7 +109,12 @@ int get_table_configuration(int argc, char *const *restrict const argv,
             die("missing operand for -%c option", optopt);
 
         case '?':
-            die("unrecognized option: -%c", optopt);
+            if (optopt)
+                die("unrecognized option: -%c", optopt);
+            else if (k_accept_longopts != (0))
+                die("unrecognied option: %s", argv[optind - 1]);
+            else
+                die(BUG("unrecognized option diagnostic failed"));
 
         default:
             die(BUG("getopt() returned %d '%c'"), opt, opt);
