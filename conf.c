@@ -118,7 +118,7 @@ static void process_option(char *const *restrict const argv, const int opt,
 }
 
 // Reads options (and their operands) from the command-line arguments and
-// returns a string of table column specifiers.
+// returns a string of column specifiers for the file extent table.
 int get_table_configuration(int argc, char *const *restrict const argv,
                             struct conf *restrict const cp)
 {
