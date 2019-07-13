@@ -1,5 +1,5 @@
 sanitizers := -fsanitize=address,undefined
-CFLAGS += $(sanitizers) -O3 -std=c11 -pedantic-errors
+CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
 LDFLAGS += $(sanitizers)
 
 ifeq ($(shell ./is-clang $(CC)),yes)
