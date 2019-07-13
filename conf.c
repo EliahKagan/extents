@@ -51,5 +51,5 @@ int get_table_configuration(int argc, char *const *const argv,
         }
     }
 
-    return optind;
+    return optind - 1;
 }
