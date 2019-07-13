@@ -21,7 +21,7 @@ $(target): $(objs)
 
 .PHONY: test
 test: $(target) $(testpath)
-	./run-fiemap-test $(testpath)
+	./fiemap-test $(testpath)
 
 .PHONY: check
 check: test
