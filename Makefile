@@ -1,6 +1,6 @@
 sanitizers := -fsanitize=address,undefined
-CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
-LDFLAGS += $(sanitizers)
+override CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
+override LDFLAGS += $(sanitizers)
 
 ifeq ($(shell ./is-clang $(CC)),yes)
 	CFLAGS += -Weverything -Wno-disabled-macro-expansion
