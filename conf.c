@@ -48,7 +48,6 @@ int get_table_configuration(int argc, char *const *const argv,
             show_help_and_quit();
 
         case ':':
-            // FIXME: Check that optopt has the value I think it has here.
             die("missing operand for -%c option", optopt);
 
         case '?':
