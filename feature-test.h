@@ -7,7 +7,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif
-#define _POSIX_C_SOURCE 2
+#define _GNU_SOURCE
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
