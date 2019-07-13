@@ -27,7 +27,9 @@ static noreturn void show_help_and_quit(void)
     puts("  f or F   final block on disk, in sectors (f) or bytes (F)");
     puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)\n");
     puts("The -B option means -t LIFC.");
-    puts("The -s option means -t lifc, which is the default.");
+    puts("The -s option means -t lifc, which is the default.\n");
+    puts("Each -t, -B, or -s replaces, and doesn't add to, any preceding "
+            "ones.");
 
     exit(EXIT_SUCCESS);
 }
