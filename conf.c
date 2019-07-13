@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+// The table's column defaults are LOGICAL, INITIAL, FINAL, COUNT.
+#define COLUMNS_DEFAULT_IN_SECTORS "lifc"
+#define COLUMNS_DEFAULT_IN_BYTES "LIFC"
+
 // Like it says on the tin. Prints a help message and exits indicating success.
 static noreturn void show_help_and_quit(void)
 {
@@ -38,15 +42,23 @@ int get_table_configuration(int argc, char *const *const argv,
 
     set_progname(argv[0]);
 
-    cp->columns = "lifc"; // Default config: LOGICAL, INITIAL, FINAL, COUNT.
+    cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
 
     // TODO: Maybe support long options. But I'm unsure whether wise to use
     //       getopt_long(); musl compatibility remains a goal for this program.
     opterr = false;
-    for (int opt = 0; (opt = getopt(argc, argv, ":t:h")) != -1; ) {
+    for (int opt = 0; (opt = getopt(argc, argv, ":t:Bsh")) != -1; ) {
         switch (opt) {
         case 't':
             cp->columns = optarg;
+            break;
+
+        case 'B':
+            cp->columns = COLUMNS_DEFAULT_IN_BYTES;
+            break;
+
+        case 's':
+            cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
             break;
 
         case 'h':
