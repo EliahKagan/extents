@@ -8,9 +8,9 @@ else
 	CFLAGS += -Wall -Wextra
 endif
 
-srcs = $(wildcard *.c)
-objs = $(srcs:.c=.o)
-deps = $(srcs:.c=.d)
+srcs := $(wildcard *.c)
+objs := $(srcs:.c=.o)
+deps := $(srcs:.c=.d)
 
 fiemap: $(objs)
 
