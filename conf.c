@@ -28,8 +28,7 @@ static noreturn void show_help_and_quit(void)
     puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)\n");
     puts("The -B option means -t LIFC.");
     puts("The -s option means -t lifc, which is the default.\n");
-    puts("Each -t, -B, or -s replaces, and doesn't add to, any preceding "
-            "ones.");
+    puts("Mutliple column specifications don't combine. The last one wins.");
 
     exit(EXIT_SUCCESS);
 }
