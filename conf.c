@@ -67,6 +67,12 @@ static const char *const k_shortopts = ":t:Bsh";
 #else
 static const struct option k_longopts[] = {
     // FIXME: write the non-last elements
+    { "table", required_argument, NULL, 't' },
+    { "bytes", no_argument, NULL, 'B' },
+    { "sectors", no_argument, NULL, 's' },
+    { "secs", no_argument, NULL, 's' },
+    //{ "sec", no_argument, NULL, 's' },
+    { "help", no_argument, NULL, 'h' },
     { 0 }
 };
 
