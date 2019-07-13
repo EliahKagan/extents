@@ -82,7 +82,7 @@ static const struct option k_longopts[] = {
 int get_table_configuration(int argc, char *const *restrict const argv,
                             struct conf *restrict const cp)
 {
-    // TOOD: Maybe extract some parts of this function into other functions.
+    // TODO: Maybe extract some parts of this function into other functions.
     assert(argc > 0);
     assert(argv);
     assert(cp);
