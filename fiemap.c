@@ -46,8 +46,7 @@ static __u64 get_offset(const dev_t dev)
         die(BUG("sysfs path exceeds buffer"));
 
     FILE *const sysfp = fopen(path, "r");
-    if (!sysfp)
-        die("%s: %s", path, strerror(errno));
+    if (!sysfp) die("%s: %s", path, strerror(errno));
 
     __u64 offset_in_sectors = 0uLL;
     char extra = '\0';
