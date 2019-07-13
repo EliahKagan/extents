@@ -8,17 +8,18 @@ else
 	CFLAGS += -Wall -Wextra
 endif
 
-srcs = $(wildcard *.c)
-objs = $(srcs:.c=.o)
-deps = $(srcs:.c=.d)
+target := fiemap
+srcs := $(wildcard *.c)
+objs := $(srcs:.c=.o)
+deps := $(srcs:.c=.d)
 
-fiemap: $(objs)
+$(target): $(objs)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 .PHONY: clean
 clean:
-	$(RM) fiemap $(objs) $(deps)
+	$(RM) $(target) $(objs) $(deps)
 
 -include $(deps)
