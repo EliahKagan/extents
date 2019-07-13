@@ -53,8 +53,3 @@ int get_table_configuration(int argc, char *const *const argv,
 
     return optind;
 }
-
-void free_configuration(struct conf *const cp)
-{
-    (void)cp; // Currently nothing has to be freed, so do nothing.
-}

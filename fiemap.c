@@ -208,6 +208,4 @@ int main(int argc, char **argv)
     FILE *const fp = (strcmp(argv[1], "-") == 0 ? stdin : open_file(argv[1]));
     show_extent_info(fileno(fp), conf.columns);
     if (fp != stdin) fclose(fp);
-
-    free_configuration(&conf);
 }

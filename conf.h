@@ -19,9 +19,4 @@ struct conf {
 ATTRIBUTE((nonnull))
 int get_table_configuration(int argc, char *const *argv, struct conf *cp);
 
-// Frees data pointed to from within the conf structure pointed to by cp. Does
-// not free that structure itself. If the caller dynamically allocated *cp, the
-// caller should call free(cp) after free_configuration(cp) returns.
-void free_configuration(struct conf *cp);
-
 #endif // ! HAVE_IOCTL_1_FIEMAP_CONF_H_
