@@ -6,6 +6,7 @@
 #include "feature-test.h"
 
 #include "attribute.h"
+#include "conf.h"
 #include "constants.h"
 #include "table.h"
 #include "util.h"
@@ -132,7 +133,7 @@ static __u64 sum_extents(const struct fiemap *const fmp)
     return sum;
 }
 
-ATTRIBUTE((nonnull(1)))
+ATTRIBUTE((nonnull))
 static void show_end(const struct fiemap *const fmp, const __u64 real_size)
 {
     assert(fmp);
@@ -161,7 +162,7 @@ static void show_end(const struct fiemap *const fmp, const __u64 real_size)
             last_length - unused, last_length);
 }
 
-ATTRIBUTE((nonnull(1)))
+ATTRIBUTE((nonnull))
 static void show_interpretation_guide(const struct fiemap *const fmp,
                                       const off_t size)
 {
@@ -179,7 +180,8 @@ static void show_interpretation_guide(const struct fiemap *const fmp,
         puts("There are no extents.");
 }
 
-static void show_extent_info(const int fd)
+ATTRIBUTE((nonnull))
+static void show_extent_info(const int fd, const char *const columns)
 {
     struct stat st = { 0 };
     if (fstat(fd, &st) != 0) die("can't stat: %s", strerror(errno));
@@ -187,7 +189,7 @@ static void show_extent_info(const int fd)
     const __u64 offset = get_offset(st.st_dev);
     struct fiemap *const fmp = get_fiemap(fd);
 
-    show_extent_table(fmp, offset, "lifc");
+    show_extent_table(fmp, offset, columns);
     show_interpretation_guide(fmp, st.st_size);
 
     free(fmp);
@@ -195,11 +197,17 @@ static void show_extent_info(const int fd)
 
 int main(int argc, char **argv)
 {
-    set_progname(argv[0]);
+    struct conf conf = { 0 };
+    const int arg_delta = get_table_configuration(argc, argv, &conf);
+    argc -= arg_delta;
+    argv += arg_delta;
+
     if (argc < 2) die("too few arguments");
     if (argc > 2) die("too many arguments");
 
     FILE *const fp = (strcmp(argv[1], "-") == 0 ? stdin : open_file(argv[1]));
-    show_extent_info(fileno(fp));
+    show_extent_info(fileno(fp), conf.columns);
     if (fp != stdin) fclose(fp);
+
+    free_configuration(&conf);
 }
