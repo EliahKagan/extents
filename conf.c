@@ -66,7 +66,6 @@ static const char *const k_shortopts = ":t:Bsh";
 #define GETOPT(ac, av) (getopt(ac, av, k_shortopts))
 #else
 static const struct option k_longopts[] = {
-    // FIXME: write the non-last elements
     { "table", required_argument, NULL, 't' },
     { "bytes", no_argument, NULL, 'B' },
     { "sectors", no_argument, NULL, 's' },
