@@ -10,7 +10,7 @@
 // User-provided configuration. Currently this just contains the columns string
 // but in future versions it may be expanded with more fields.
 struct conf {
-    char *columns;
+    const char *columns;
 };
 
 // Parses options and their operands out of command-line arguments using
