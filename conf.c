@@ -71,7 +71,6 @@ static const struct option k_longopts[] = {
     { "bytes", no_argument, NULL, 'B' },
     { "sectors", no_argument, NULL, 's' },
     { "secs", no_argument, NULL, 's' },
-    //{ "sec", no_argument, NULL, 's' },
     { "help", no_argument, NULL, 'h' },
     { 0 }
 };
