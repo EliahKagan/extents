@@ -60,9 +60,11 @@ static noreturn void show_help_and_quit(void)
     exit(EXIT_SUCCESS);
 }
 
+// Short options this program accepts, in the getopt() shortopts notation.
 static const char *const k_shortopts = ":t:Bsh";
 
 #ifdef NO_LONGOPTS
+// Processes short options.
 #define GETOPT(ac, av) (getopt(ac, av, k_shortopts))
 #else
 static const struct option k_longopts[] = {
@@ -74,9 +76,11 @@ static const struct option k_longopts[] = {
     { 0 }
 };
 
+// Processes short and long options.
 #define GETOPT(ac, av) (getopt_long(ac, av, k_shortopts, k_longopts, NULL))
 #endif
 
+// Prints an error about an unrecognized command-line option flag, and quits.
 static noreturn void die_unrecognized_option(char *const *const argv)
 {
     if (optopt)
@@ -87,6 +91,7 @@ static noreturn void die_unrecognized_option(char *const *const argv)
         die(BUG("unrecognized option diagnostic failed"));
 }
 
+// Process a single command-line option, including its opernad(s) if any.
 static void process_option(char *const *restrict const argv, const int opt,
                            struct conf *restrict const cp)
 {
@@ -117,8 +122,6 @@ static void process_option(char *const *restrict const argv, const int opt,
     }
 }
 
-// Reads options (and their operands) from the command-line arguments and
-// returns a string of column specifiers for the file extent table.
 int get_table_configuration(int argc, char *const *restrict const argv,
                             struct conf *restrict const cp)
 {
