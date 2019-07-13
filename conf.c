@@ -33,8 +33,8 @@ static noreturn void show_help_and_quit(void)
     exit(EXIT_SUCCESS);
 }
 
-int get_table_configuration(int argc, char *const *const argv,
-                            struct conf *const cp)
+int get_table_configuration(int argc, char *const *restrict const argv,
+                            struct conf *restrict const cp)
 {
     // TODO: Maybe refactor this function into multiple functions.
     assert(argc > 0);

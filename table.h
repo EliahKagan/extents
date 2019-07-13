@@ -35,7 +35,7 @@ struct tablespec {
 };
 
 ATTRIBUTE((nonnull))
-void show_extent_table(const struct fiemap *fmp, const __u64 offset,
-                       const char *columns);
+void show_extent_table(const struct fiemap *restrict fmp, const __u64 offset,
+                       const char *restrict columns);
 
 #endif // ! HAVE_IOCTL_1_FIEMAP_TABLE_H_

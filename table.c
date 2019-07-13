@@ -48,8 +48,9 @@ static inline __u64 get_raw(const struct fiemap_extent *const fep,
 }
 
 ATTRIBUTE((nonnull))
-static inline __u64 get(const struct fiemap *const fmp,
-                        const struct colspec *const csp, const __u32 row_index)
+static inline __u64
+get(const struct fiemap *restrict const fmp,
+    const struct colspec *restrict const csp, const __u32 row_index)
 {
     assert(fmp);
     assert(csp);
@@ -228,8 +229,9 @@ static void specify_column(struct colspec *const colp,
     }
 }
 
-void show_extent_table(const struct fiemap *const fmp, const __u64 offset,
-                       const char *const columns)
+void
+show_extent_table(const struct fiemap *restrict const fmp, const __u64 offset,
+                  const char *restrict const columns)
 {
     enum { gap_width = 3 }; // TODO: Let the user customize this.
     assert(fmp);
