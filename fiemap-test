@@ -1,16 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
-# fiemap-test
+# run-fiemap-test
 #
-# Attempts to reconstitute a file from the output of running fiemap on it.
-# This script must be run as root, but fiemap needn't be. Suggested usage is
-#
-#     ./fiemap PATH | tee >(sudo ./fiemap-test)
-#
-# where PATH is replaced by the PATH of the file whose blocks you want to test
-# with.
-#
-# TODO: Replace this bash script with a better awk -f script.
+# Runs fiemap and fiemap-test in the suggested way.
+# See the comment at the top of fiemap-test for details.
 
-set -f
-echo "$EUID"
+set -ef
+set -o pipefail
+./fiemap "$@" | tee >(sudo ./fiemap-test "$@")

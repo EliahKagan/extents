@@ -1,2 +1,3 @@
 is-clang text eol=lf
 fiemap-test text eol=lf
+run-fiemap-test text eol=lf
