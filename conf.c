@@ -15,8 +15,8 @@
 #endif
 
 // The table's column defaults are LOGICAL, INITIAL, FINAL, COUNT.
-#define COLUMNS_DEFAULT_IN_SECTORS "lifc"
-#define COLUMNS_DEFAULT_IN_BYTES "LIFC"
+static const char *const k_columns_default_in_sectors = "lifc";
+static const char *const k_columns_default_in_bytes = "LIFC";
 
 enum compile_time_longopts_configuration {
 #ifdef NO_LONGOPTS
@@ -26,13 +26,22 @@ enum compile_time_longopts_configuration {
 #endif
 };
 
-// Like it says on the tin. Prints a help message and exits indicating success.
+// Prints brief version information and exits indicating success.
+static noreturn void show_version_and_quit(void)
+{
+    puts("fiemap, v0.1 (alpha)");
+    exit(EXIT_SUCCESS);
+}
+
+// Prints a help message and exits indicating success.
 static noreturn void show_help_and_quit(void)
 {
     puts("Usage:\n");
+
     printf("  %s [-t licfLICF] PATH\n", progname());
     printf("  %s -B PATH\n", progname());
-    printf("  %s -s PATH\n\n", progname());
+    printf("  %s -s PATH\n", progname());
+    printf("  %s { -V | -h }\n\n", progname());
 
     if (k_accept_longopts == (0)) {
         puts("The -t option specifies a full list of columns as follows:\n");
@@ -46,22 +55,25 @@ static noreturn void show_help_and_quit(void)
     puts("  f or F   final block on disk, in sectors (f) or bytes (F)");
     puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)\n");
 
+    puts("Mutliple column specifications don't combine. The last one wins.\n");
+
     if (k_accept_longopts == (0)) {
         puts("The -B option means -t LIFC.");
-        puts("The -s option means -t lifc, which is the default.\n");
+        puts("The -s option means -t lifc, which is the default.");
+        puts("The -V option prints brief version information.");
+        puts("The -h option prints this help message.\n");
     } else {
         puts("The -B (--bytes) option means -t LIFC.");
-        puts("The -s (--sectors) option means -t lifc, which is the"
-                " default.\n");
+        puts("The -s (--sectors) option means -t lifc, which is the default.");
+        puts("The -V (--version) option prints brief version information.");
+        puts("The -h (--help) option prints this help message.");
     }
-
-    puts("Mutliple column specifications don't combine. The last one wins.");
 
     exit(EXIT_SUCCESS);
 }
 
 // Short options this program accepts, in the getopt() shortopts notation.
-static const char *const k_shortopts = ":t:Bsh";
+static const char *const k_shortopts = ":t:BsVh";
 
 #ifdef NO_LONGOPTS
 // Processes short options.
@@ -72,6 +84,7 @@ static const struct option k_longopts[] = {
     { "bytes", no_argument, NULL, 'B' },
     { "sectors", no_argument, NULL, 's' },
     { "secs", no_argument, NULL, 's' },
+    { "version", no_argument, NULL, 'V' },
     { "help", no_argument, NULL, 'h' },
     { 0 }
 };
@@ -101,12 +114,15 @@ static void process_option(char *const *restrict const argv, const int opt,
         break;
 
     case 'B':
-        cp->columns = COLUMNS_DEFAULT_IN_BYTES;
+        cp->columns = k_columns_default_in_bytes;
         break;
 
     case 's':
-        cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
+        cp->columns = k_columns_default_in_sectors;
         break;
+
+    case 'V':
+        show_version_and_quit();
 
     case 'h':
         show_help_and_quit();
@@ -131,7 +147,7 @@ int get_table_configuration(int argc, char *const *restrict const argv,
 
     set_progname(argv[0]);
 
-    cp->columns = COLUMNS_DEFAULT_IN_SECTORS;
+    cp->columns = k_columns_default_in_sectors;
 
     opterr = false;
     for (int opt = 0; (opt = GETOPT(argc, argv)) != -1; )
