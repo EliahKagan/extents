@@ -116,7 +116,7 @@ int get_table_configuration(int argc, char *const *restrict const argv,
             if (optopt)
                 die("unrecognized option: -%c", optopt);
             else if (k_accept_longopts != (0))
-                die("unrecognied option: %s", argv[optind - 1]);
+                die("unrecognized option: %s", argv[optind - 1]);
             else
                 die(BUG("unrecognized option diagnostic failed"));
 
