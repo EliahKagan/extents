@@ -13,12 +13,17 @@
 // Like it says on the tin. Prints a help message and exits indicating success.
 static noreturn void show_help_and_quit(void)
 {
-    printf("Usage:  %s [-t licfLICF] PATH\n\n", progname());
+    puts("Usage:\n");
+    printf("  %s [-t licfLICF] PATH\n", progname());
+    printf("  %s -B PATH\n", progname());
+    printf("  %s -s PATH\n\n", progname());
     puts("The -t option specifies a full list of columns as follows:\n");
     puts("  l or L   logical offset in file, in sectors (l) or bytes (L)");
     puts("  i or I   initial block on disk, in sectors (i) or bytes (I)");
     puts("  f or F   final block on disk, in sectors (f) or bytes (F)");
-    puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)");
+    puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)\n");
+    puts("The -B option means -t LIFC.");
+    puts("The -s option means -t lifc, which is the default.");
 
     exit(EXIT_SUCCESS);
 }
