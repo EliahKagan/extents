@@ -1,5 +1,4 @@
 // feature-test.h - feature test macros to define above system header includes
-//  Used by fiemap.c.
 
 #ifndef HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
 #define HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
