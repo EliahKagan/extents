@@ -1,3 +1,4 @@
+testpath := test-symlink
 sanitizers := -fsanitize=address,undefined
 override CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
 override LDFLAGS += $(sanitizers)
@@ -17,6 +18,13 @@ $(target): $(objs)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+
+.PHONY: test
+test: $(target) $(testpath)
+	./run-fiemap-test $(testpath)
+
+.PHONY: check
+check: test
 
 .PHONY: clean
 clean:

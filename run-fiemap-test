@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# run-fiemap-test
+#
+# Runs fiemap and fiemap-test in the suggested way.
+# See the comment at the top of fiemap-test for details.
+
+set -ef
+set -o pipefail
+./fiemap "$@" | tee >(sudo ./fiemap-test "$@")
