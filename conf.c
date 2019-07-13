@@ -104,7 +104,7 @@ static noreturn void die_unrecognized_option(char *const *const argv)
         die(BUG("unrecognized option diagnostic failed"));
 }
 
-// Process a single command-line option, including its opernad(s) if any.
+// Process a single command-line option, including its operand(s) if any.
 static void process_option(char *const *restrict const argv, const int opt,
                            struct conf *restrict const cp)
 {
