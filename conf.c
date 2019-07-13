@@ -122,7 +122,6 @@ static void process_option(char *const *restrict const argv, const int opt,
 int get_table_configuration(int argc, char *const *restrict const argv,
                             struct conf *restrict const cp)
 {
-    // TODO: Maybe extract some parts of this function into other functions.
     assert(argc > 0);
     assert(argv);
     assert(cp);
