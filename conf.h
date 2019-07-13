@@ -14,8 +14,8 @@ struct conf {
 };
 
 // Parses options and their operands out of command-line arguments using
-// getopt(). Doesn't process non-option arguments. Returns the index of the
-// first non-option argument or, if there are none, argc.
+// getopt(). Doesn't process non-option arguments. Returns an index to the
+// first non-option argument or, if there are no such arguments, argc.
 ATTRIBUTE((nonnull))
 int get_table_configuration(int argc, char *const *restrict argv,
                             struct conf *restrict cp);
