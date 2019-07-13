@@ -21,13 +21,27 @@ static noreturn void show_help_and_quit(void)
     printf("  %s [-t licfLICF] PATH\n", progname());
     printf("  %s -B PATH\n", progname());
     printf("  %s -s PATH\n\n", progname());
+
+#ifdef NO_LONGOPTS
     puts("The -t option specifies a full list of columns as follows:\n");
+#else
+    puts("The -t (--table) option specifies a full list of columns as"
+            " follows:\n");
+#endif
+
     puts("  l or L   logical offset in file, in sectors (l) or bytes (L)");
     puts("  i or I   initial block on disk, in sectors (i) or bytes (I)");
     puts("  f or F   final block on disk, in sectors (f) or bytes (F)");
     puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)\n");
+
+#ifdef NO_LONGOPTS
     puts("The -B option means -t LIFC.");
     puts("The -s option means -t lifc, which is the default.\n");
+#else
+    puts("The -B (--bytes) option means -t LIFC.");
+    puts("The -s (--sectors) option means -t lifc, which is the default.\n");
+#endif
+
     puts("Mutliple column specifications don't combine. The last one wins.");
 
     exit(EXIT_SUCCESS);
