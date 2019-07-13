@@ -17,7 +17,7 @@ struct conf {
 // getopt(). Doesn't process non-option arguments. Returns an index to the
 // first non-option argument or, if there are no such arguments, argc.
 ATTRIBUTE((nonnull))
-int get_table_configuration(int argc, char *const *restrict argv,
+int get_table_configuration(int argc, char **restrict argv,
                             struct conf *restrict cp);
 
 #endif // ! HAVE_IOCTL_1_FIEMAP_CONF_H_

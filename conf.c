@@ -138,7 +138,7 @@ static void process_option(char *const *restrict const argv, const int opt,
     }
 }
 
-int get_table_configuration(int argc, char *const *restrict const argv,
+int get_table_configuration(int argc, char **restrict const argv,
                             struct conf *restrict const cp)
 {
     assert(argc > 0);
