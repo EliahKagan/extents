@@ -6,12 +6,21 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-static void help(void)
+// Like it says on the tin. Prints a help message and exits indicating success.
+static noreturn void show_help_and_quit(void)
 {
-    // FIXME: Actually print a help message before returning.
+    printf("Usage:  %s [-t licfLICF] PATH\n\n", progname());
+    puts("The -t option specifies a full list of columns as follows:\n");
+    puts("  l or L   logical offset in file, in sectors (l) or bytes (L)");
+    puts("  i or I   initial block on disk, in sectors (i) or bytes (I)");
+    puts("  f or F   final block on disk, in sectors (f) or bytes (F)");
+    puts("  c or C   count of blocks in file, in sectors (c) or bytes (C)");
+
+    exit(EXIT_SUCCESS);
 }
 
 int get_table_configuration(int argc, char *const *const argv,
@@ -36,8 +45,7 @@ int get_table_configuration(int argc, char *const *const argv,
             break;
 
         case 'h':
-            help();
-            exit(EXIT_SUCCESS);
+            show_help_and_quit();
 
         case ':':
             // FIXME: Check that optopt has the value I think it has here.
