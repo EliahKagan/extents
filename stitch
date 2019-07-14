@@ -11,7 +11,10 @@ die() {
 
 readonly -i sector_size=512
 
+
+##########################################################################
 ### Define the patterns (regexes) that match parts of fiemap's output. ###
+##########################################################################
 
 # $empty matches a blank line, which is used as a divider (no captures).
 readonly empty='^$'
@@ -30,22 +33,25 @@ readonly sec='\(sec\)'
 lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
 readonly labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
 
-# $row matches a row of the table (4 captures).
-readonly row="^$gap$num$gap$num$gap$num\$"
+# $table_row matches a row of the table (4 captures).
+readonly table_row="^$gap$num$gap$num$gap$num\$"
 
 # $trivial matches fiemap's last output line for an empty file (no captures).
 readonly trivial='^There are no extents\.$'
 
 # $outro matches fiemap's last ouptut line otherwise (4 captures).
+# This is the "outro" or "interpretation guide."
 readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
 
 
+##########################################################################
 ### Read the input (i.e., fiemap output) and check it for consistency. ###
+##########################################################################
 
 declare -a lines
 mapfile -t lines
-readonly -i lc="${#lines}"
-((lc > 0)) || die 'no input'
+readonly -i li=0 lc="${#lines}"
+((li < lc)) || die 'no input'
 
 # Parse the intro line, which gives device information.
 [[ ${lines[0]} =~ $intro ]] || die 'malformed intro line'
@@ -57,14 +63,59 @@ readonly -i dev_start_sector="${BASH_REMATCH[4]}"
     die 'device start in bytes and sectors seem to disagree'
 
 # Parse the blank and column labels, which appear even if there are no rows.
-((lc > 1)) || die 'input ends abruptly after intro'
-[[ ${lines[1]} =~ $empty ]] || die 'no empty line divides intro from table'
-((lc > 2)) || 'no table (not even the row of column labels)'
-[[ ${lines[2]} =~ $labels ]] || die 'malformed column labels line'
+((++li < lc)) || die 'input ends abruptly after intro'
+[[ ${lines[li]} =~ $empty ]] || die 'no empty line divides intro from table'
+((++li < lc)) || die 'no table (not even the row of column labels)'
+[[ ${lines[li]} =~ $labels ]] || die 'malformed column labels line'
 
+# Variables for parsing, and later using, information from table entries.
+declare -ai starts=() lengths=()
+declare -i logical=0 initial final count
 
+# Parse the entries from each table row, checking that they make sense.
+while ((++li < lc)) && [[ ${lines[li]} =~ $table_row ]]; do
+    ((BASH_REMATCH[1] == logical)) || die 'inconsistent logical offset'
+    initial="${BASH_REMATCH[2]}"
+    final="${BASH_REMATCH[3]}"
+    count="${BASH_REMATCH[4]}"
 
-declare -i i
-for ((i = 0; i < lc; ++i)); do
-    :
+    # FIXME: Does fiemap handle zero-length extents? Should it?
+    ((final - initial + 1 == count)) || die 'wrong count from initial to final'
+    starts+=("$initial")
+    lengths+=("$count")
+
+    logical+="$count"
 done
+
+# Parse the blank line after the table.
+((li < lc)) || die 'input ends abruptly after table'
+[[ ${lines[li]} =~ $empty ]] ||
+    die 'no empty line divides table from interpretation guide'
+
+# Try to parse the outro ("interpretation guide") for an empty input file.
+# FIXME: write the code for this
+
+# Parse the outro ("interpretation guide") for a non-empty input file.
+((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
+[[ ${lines[li] =~ $outro } ]] || die 'malformed interpretation guide'
+readonly -i used_bytes="${BASH_REMATCH[1]}"
+readonly -i total_bytes="${BASH_REMATCH[2]}"
+readonly -i last_used_bytes="${BASH_REMATCH[3]}"
+readonly -i last_total_bytes="${BASH_REMATCH[4]}"
+
+# Check that the values parsed from the nontrivial outro make sense.
+((total_bytes == logical * sector_size)) ||
+    die 'total bytes used by file not equal to sum of extents'
+((0 < used_bytes)) || die "no used bytes, but file isn't empty?"
+((used_bytes <= total_bytes)) || die 'more bytes used than in all extents!'
+((0 < last_used_bytes)) || die "last extent is unused, that's weird"
+((last_used_bytes <= last_total_bytes)) ||
+    die 'last extent has more bytes used than present!'
+
+
+
+
+exec 3<"/sys/dev/block/$dev_major/0"
+
+
+exec 3<&-
