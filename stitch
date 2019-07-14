@@ -54,7 +54,7 @@ labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
 readonly labels
 
 # $table_row matches a row of the table (4 captures).
-readonly table_row="^$gap$num$gap$num$gap$num\$"
+readonly table_row="^$gap$num$gap$num$gap$num$gap$num\$"
 
 # $trivial matches fiemap's last output line for an empty file (no captures).
 readonly trivial='^There are no extents\.$'
