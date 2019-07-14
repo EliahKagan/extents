@@ -48,7 +48,7 @@ readonly offset="byte $num \\(sector $num\\)"  # capture groups 3 and 4
 readonly intro="^On $device, which starts at $offset:\$"
 
 # $labels matches the table's columns headings (no captures).
-readonly sec='\(sec\)'
+readonly sec=' \(sec\)'
 lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
 labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
 readonly labels
