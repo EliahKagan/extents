@@ -166,7 +166,7 @@ volume="$(find_node "$dev_major" "$dev_minor")" ||
 readonly volume
 msg "The volume seems to be $dev_major:$dev_minor ($volume)."
 
-if ((minor == 0)); then
+if ((dev_minor == 0)); then
     readonly disk="$volume"
 else
     # TODO: Research if this assumption is really sound.
