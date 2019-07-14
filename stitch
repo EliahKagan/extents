@@ -121,8 +121,10 @@ done
 
 # Parse the blank line after the table.
 ((li < lc)) || die 'input ends abruptly after table'
-[[ ${lines[li]} =~ $empty ]] ||
+[[ ${lines[li]} =~ $empty ]] || {
+    msg "DEBUG: line $li: [${lines[li]}]"
     die 'no empty line divides table from interpretation guide'
+}
 ((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
 # Try to parse the outro ("interpretation guide") for an empty input file.
