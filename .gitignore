@@ -19,3 +19,6 @@
 
 # Dumps from files and devices
 /dump*
+
+# Test outfile
+/fiemap.out
