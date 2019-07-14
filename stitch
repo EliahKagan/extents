@@ -28,7 +28,7 @@ find_node() {
     udevadm info -rq name "$meta"
 }
 
-readonly -i sector_size=512
+declare -ri sector_size=512
 
 
 ##########################################################################
@@ -36,31 +36,31 @@ readonly -i sector_size=512
 ##########################################################################
 
 # $empty matches a blank line, which is used as a divider (no captures).
-readonly empty='^$'
+declare -r empty='^$'
 
 # These regexes appear as helpers in several of those to follow.
-readonly num='([0-9]+)'
-readonly gap=' {2,}'
+declare -r num='([0-9]+)'
+declare -r gap=' {2,}'
 
 # $intro matches fiemap's first output line (4 captures).
-readonly device="block device $num:$num"       # capture groups 1 and 2
-readonly offset="byte $num \\(sector $num\\)"  # capture groups 3 and 4
-readonly intro="^On $device, which starts at $offset:\$"
+declare -r device="block device $num:$num"       # capture groups 1 and 2
+declare -r offset="byte $num \\(sector $num\\)"  # capture groups 3 and 4
+declare -r intro="^On $device, which starts at $offset:\$"
 
 # $labels matches the table's columns headings (no captures).
-readonly sec='\(sec\)'
+declare -r sec='\(sec\)'
 lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
-readonly labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
+declare -r labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
 
 # $table_row matches a row of the table (4 captures).
-readonly table_row="^$gap$num$gap$num$gap$num\$"
+declare -r table_row="^$gap$num$gap$num$gap$num\$"
 
 # $trivial matches fiemap's last output line for an empty file (no captures).
-readonly trivial='^There are no extents\.$'
+declare -r trivial='^There are no extents\.$'
 
 # $outro matches fiemap's last ouptut line otherwise (4 captures).
 # This is the "outro" or "interpretation guide."
-readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
+declare -r outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
 
 
 ##########################################################################
@@ -70,7 +70,7 @@ readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
 # Perform the actual IO read. After this, we are iterating an array.
 declare -a lines
 mapfile -t lines
-readonly -i lc="${#lines}"
+declare -ri lc="${#lines}"
 declare -i li=0
 
 # This function will be called after processing complete well-formed input.
@@ -84,10 +84,10 @@ parse_end() {
 # Parse the intro line, which gives device information.
 ((li < lc)) || die 'no input'
 [[ ${lines[0]} =~ $intro ]] || die 'malformed intro line'
-readonly -i dev_major="${BASH_REMATCH[1]}"
-readonly -i dev_minor="${BASH_REMATCH[2]}"
-readonly -i dev_start_byte="${BASH_REMATCH[3]}"
-readonly -i dev_start_sector="${BASH_REMATCH[4]}"
+declare -ri dev_major="${BASH_REMATCH[1]}"
+declare -ri dev_minor="${BASH_REMATCH[2]}"
+declare -ri dev_start_byte="${BASH_REMATCH[3]}"
+declare -ri dev_start_sector="${BASH_REMATCH[4]}"
 ((dev_start_sector * sector_size == dev_start_byte)) ||
     die 'device start in bytes and sectors seem to disagree'
 
@@ -132,10 +132,10 @@ fi
 
 # Parse the outro ("interpretation guide") for a non-empty input file.
 [[ ${lines[li] =~ $outro } ]] || die 'malformed interpretation guide'
-readonly -i used_bytes="${BASH_REMATCH[1]}"
-readonly -i total_bytes="${BASH_REMATCH[2]}"
-readonly -i last_used_bytes="${BASH_REMATCH[3]}"
-readonly -i last_total_bytes="${BASH_REMATCH[4]}"
+declare -ri used_bytes="${BASH_REMATCH[1]}"
+declare -ri total_bytes="${BASH_REMATCH[2]}"
+declare -ri last_used_bytes="${BASH_REMATCH[3]}"
+declare -ri last_total_bytes="${BASH_REMATCH[4]}"
 
 # Check that the nontrivial outro doesn't directly contradict the table.
 ((0 < ${#starts})) || die 'wrong interpretation guide for no extents'
@@ -159,16 +159,16 @@ parse_end
 ### Attempt to stitch the sectors together by reading physical blocks. ###
 ##########################################################################
 
-readonly volume="$(find_node "$major" "$minor")" ||
+declare -r volume="$(find_node "$major" "$minor")" ||
     die "can't find node for volume $major:$minor"
 
 msg "The volume seems to be $major:$minor ($volume)."
 
 if ((minor == 0)); then
-    readonly disk="$volume"
+    declare -r disk="$volume"
 else
     # TODO: Research if this assumption is really sound.
-    readonly disk="$(find_node "$major" 0)" ||
+    declare -r disk="$(find_node "$major" 0)" ||
         die "can't find node for disk $major:$minor"
 fi
 
@@ -190,13 +190,13 @@ for ((i = 0; i < ${#starts} - 1; ++i)); do
 done
 
 # Read as many used full sectors as possible from the last extent.
-readonly -i last_full_sectors="$((last_used_bytes / sector_size))"
+declare -ri last_full_sectors="$((last_used_bytes / sector_size))"
 dd skip="${starts[i]}" count="${last_full_sectors}" status=none <&3 ||
     die "can't read $last_full_sectors sectors at ${starts[i]} (row $i)"
 
 # Read whatever remaining used data are stored in the last extent.
-readonly -i trailing_bytes="$((last_used_bytes % sector_size))"
-readonly -i last_full_bytes="$((last_used_bytes - trailing_bytes))"
+declare -ri trailing_bytes="$((last_used_bytes % sector_size))"
+declare -ri last_full_bytes="$((last_used_bytes - trailing_bytes))"
 ((last_full_bytes == last_full_sectors * sector_size)) ||
     bug 'last_full_bytes disagrees with last_full_sectors'
 dd bs=1 skip="$last_full_bytes" count="$trailing_bytes" status=none <&3 ||
