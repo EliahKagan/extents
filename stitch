@@ -13,8 +13,11 @@ set -efo pipefail
 # Prints a message. Since stdout is a sink for raw data, stderr is used.
 msg() { printf '%s: %s\n' "$0" "$1" >&2; }
 
-# Prints and error message and exits indicating failure.
+# Prints an error message and exits indicating failure.
 die() { msg "error: $1"; exit 1; }
+
+# Prints an error message marked "internal error" and exits indicating failure.
+bug() { die "internal error: $1"; }
 
 # Attempts to find a block device of known (major, minor) in the filesystem.
 find_node() {
@@ -121,8 +124,7 @@ done
 ((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
 # Try to parse the outro ("interpretation guide") for an empty input file.
-((${#starts} == ${#lengths})) ||
-    die "internal error: starts and lengths don't correspond"
+((${#starts} == ${#lengths})) || bug "starts and lengths don't correspond"
 if ((${#starts} == 0)); then
     parse_end
     exit
@@ -178,13 +180,22 @@ msg "The disk seems to be $major:0 ($disk)."
 
 exec 3<"$disk" || die "can't open device node for disk $major:0"
 
+((0 < ${#starts})) || bug 'no blocks'
+
+# Read data for all but the last extent.
 declare -i i
-for i in "${!starts[@]}"; do
+for ((i = 0; i < ${#starts} - 1; ++i)); do
     dd skip="${starts[i]}" count="${lengths[i]}" <&3 ||
         die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
 done
 
-exec 3<&- || die "can't close device node for disk $major:0"
+# Read as many used full sectors as possible from the last extent.
+declare -i last_full_sectors="$((last_used_bytes / sector_size))"
+dd skip="${starts[i]}" count="${last_full_sectors}" <&3 ||
+    die "can't read $last_full_sectors sectors at ${starts[i]} (row $i)"
 
-# FIXME: All that's left to do is truncate the output file. Oh wait, it's
-#        stdout. Maye that was a bad idea.
+# Read whatever remaining used data are stored in the last extent.
+declare -i trailing_bytes="$((last_used_bytes % sector_size))"
+# FIXME: write the last dd command
+
+exec 3<&- || die "can't close device node for disk $major:0"
