@@ -2,12 +2,23 @@
 #
 # fiemap-test
 #
-# Runs fiemap on a file, and reconstitutes the file based on the locations and
-# sizes of the physical blocks provided by fiemap. Running fiemap need not
-# typically be done as root, but reading data directly from a block device does
-# require root privileges. Only that part of the job is elevated; sudo is used.
+# Verifies the fiemap output received on stdin specifies the same data as the
+# contents of the file named as its argument. ("make test" runs this script.)
+#
+# TODO: Replace this bash script with a better awk -f script.
 
-set -ef
-set -o pipefail
-sudo -v
-./fiemap "$@" | tee >(sudo ./fiemap-test-backend "$@")
+set -f
+
+die() {
+    printf '%s: error: %s\n' "$0" "$1" >&2
+    exit 1
+}
+
+(($# >= 1)) || die 'too few arguments'
+(($# <= 1)) || die 'too many arguments'
+readonly path="$1"
+
+# FIXME: Replace this with the actual test implementation.
+# This code serves merely to process all input, to test the Makefile.
+[ -e "$path" ] || die "$path: not found"
+sed 's/.*/[&]/'
