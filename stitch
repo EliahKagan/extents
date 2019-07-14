@@ -1,12 +1,28 @@
 #!/usr/bin/env bash
+#
 # stitch - Takes a fiemap listing for a file. Outputs the contents of the file.
-# TODO: Replace this bash script with an awk -f or python3 script or C program.
+#          TODO: Replace this with an awk -f or python3 script or a C program.
 
 set -efo pipefail
 
-die() {
-    printf '%s: error: %s\n' "$0" "$1" >&2
-    exit 1
+
+##########################################
+### Important functions and constants. ###
+##########################################
+
+# Prints a message. Since stdout is a sink for raw data, stderr is used.
+msg() { printf '%s: %s\n' "$0" "$1" >&2; }
+
+# Prints and error message and exits indicating failure.
+die() { msg "error: $1"; exit 1; }
+
+# Attempts to find a block device of known (major, minor) in the filesystem.
+find_node() {
+    local -ri major="$1" minor="$2"
+    local -r meta="/sys/dev/block/$major:$minor"
+
+    # FIXME: Add more methods, so this works on systems that don't use systemd!
+    udevadm info -rq name "$meta"
 }
 
 readonly -i sector_size=512
@@ -109,7 +125,7 @@ done
     die "internal error: starts and lengths don't correspond"
 if ((${#starts} == 0)); then
     parse_end
-    exit 0
+    exit
 fi
 
 # Parse the outro ("interpretation guide") for a non-empty input file.
@@ -137,9 +153,38 @@ readonly -i last_total_bytes="${BASH_REMATCH[4]}"
 parse_end
 
 
-### Attempt to stitch the sectors together from the
+##########################################################################
+### Attempt to stitch the sectors together by reading physical blocks. ###
+##########################################################################
 
-exec 3<"/sys/dev/block/$dev_major/0"
+readonly volume="$(find_node "$major" "$minor")" ||
+    die "can't find node for volume $major:$minor"
 
+msg "The volume seems to be $major:$minor ($volume)."
 
-exec 3<&-
+if ((minor == 0)); then
+    readonly disk="$volume"
+else
+    # TODO: Research if this assumption is really sound.
+    readonly disk="$(find_node "$major" 0)" ||
+        die "can't find node for disk $major:$minor"
+fi
+
+msg "The disk seems to be $major:0 ($disk)."
+
+# TODO: It's reasonable to run a non-root user for the parsing. When getopt
+#       support is added, include options to force stopping or continuing here.
+((EUID == 0)) || die "you're not root; not trying to read blocks"
+
+exec 3<"$disk" || die "can't open device node for disk $major:0"
+
+declare -i i
+for i in "${!starts[@]}"; do
+    dd skip="${starts[i]}" count="${lengths[i]}" <&3 ||
+        die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
+done
+
+exec 3<&- || die "can't close device node for disk $major:0"
+
+# FIXME: All that's left to do is truncate the output file. Oh wait, it's
+#        stdout. Maye that was a bad idea.
