@@ -72,7 +72,7 @@ readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
 declare -a lines
 mapfile -t lines
 readonly lines
-declare -ri lc="${#lines}"
+declare -ri lc="${#lines[@]}"
 declare -i li=0
 
 # This function will be called after processing complete well-formed input.
@@ -102,7 +102,7 @@ declare -ri dev_start_sector="${BASH_REMATCH[4]}"
 # Variables for parsing, and later using, information from table entries.
 declare -ai starts=() lengths=()
 declare -i logical=0 initial final count
-ldie() { die "row $((${#starts} + 1)) (line $((li + 1))): $1"; }
+ldie() { die "row $((${#starts[@]} + 1)) (line $((li + 1))): $1"; }
 
 # Parse the entries from each table row, checking that they make sense.
 while ((++li < lc)) && [[ ${lines[li]} =~ $table_row ]]; do
@@ -126,8 +126,8 @@ done
 ((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
 # Try to parse the outro ("interpretation guide") for an empty input file.
-((${#starts} == ${#lengths})) || bug "starts and lengths don't correspond"
-if ((${#starts} == 0)); then
+((${#starts[@]} == ${#lengths[@]})) || bug "starts and lengths don't correspond"
+if ((${#starts[@]} == 0)); then
     parse_end
     exit
 fi
@@ -140,7 +140,7 @@ declare -ri last_used_bytes="${BASH_REMATCH[3]}"
 declare -ri last_total_bytes="${BASH_REMATCH[4]}"
 
 # Check that the nontrivial outro doesn't directly contradict the table.
-((0 < ${#starts})) || die 'wrong interpretation guide for no extents'
+((0 < ${#starts[@]})) || die 'wrong interpretation guide for no extents'
 ((total_bytes == logical * sector_size)) ||
     die 'total bytes take up by file not equal to sum of extents'
 ((last_total_bytes == count * sector_size)) ||
@@ -182,11 +182,11 @@ msg "The disk seems to be $dev_major:0 ($disk)."
 
 exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
 
-((0 < ${#starts})) || bug 'no blocks'
+((0 < ${#starts[@]})) || bug 'no blocks'
 
 # Read data for all but the last extent.
 declare -i i
-for ((i = 0; i < ${#starts} - 1; ++i)); do
+for ((i = 0; i < ${#starts[@]} - 1; ++i)); do
     dd skip="${starts[i]}" count="${lengths[i]}" status=none <&3 ||
         die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
 done
