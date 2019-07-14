@@ -48,12 +48,22 @@ readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
 ### Read the input (i.e., fiemap output) and check it for consistency. ###
 ##########################################################################
 
+# Perform the actual IO read. After this, we are iterating an array.
 declare -a lines
 mapfile -t lines
-readonly -i li=0 lc="${#lines}"
-((li < lc)) || die 'no input'
+readonly -i lc="${#lines}"
+declare -i li=0
+
+# This function will be called after processing complete well-formed input.
+parse_end() {
+    while ((++li < lc)); do
+        [[ ${lines[li]} =~ $empty ]] ||
+            die 'unexpected non-empty trailing lines'
+    done
+}
 
 # Parse the intro line, which gives device information.
+((li < lc)) || die 'no input'
 [[ ${lines[0]} =~ $intro ]] || die 'malformed intro line'
 readonly -i dev_major="${BASH_REMATCH[1]}"
 readonly -i dev_minor="${BASH_REMATCH[2]}"
@@ -71,19 +81,20 @@ readonly -i dev_start_sector="${BASH_REMATCH[4]}"
 # Variables for parsing, and later using, information from table entries.
 declare -ai starts=() lengths=()
 declare -i logical=0 initial final count
+ldie() { die "row $((${#starts} + 1)) (line $((li + 1))): $1"; }
 
 # Parse the entries from each table row, checking that they make sense.
 while ((++li < lc)) && [[ ${lines[li]} =~ $table_row ]]; do
-    ((BASH_REMATCH[1] == logical)) || die 'inconsistent logical offset'
+    ((BASH_REMATCH[1] == logical)) || ldie 'inconsistent logical offset'
     initial="${BASH_REMATCH[2]}"
     final="${BASH_REMATCH[3]}"
     count="${BASH_REMATCH[4]}"
 
     # FIXME: Does fiemap handle zero-length extents? Should it?
-    ((final - initial + 1 == count)) || die 'wrong count from initial to final'
+    ((final - initial + 1 == count)) || ldie 'wrong initial-to-final count'
+
     starts+=("$initial")
     lengths+=("$count")
-
     logical+="$count"
 done
 
@@ -91,29 +102,42 @@ done
 ((li < lc)) || die 'input ends abruptly after table'
 [[ ${lines[li]} =~ $empty ]] ||
     die 'no empty line divides table from interpretation guide'
+((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
 # Try to parse the outro ("interpretation guide") for an empty input file.
-# FIXME: write the code for this
+((${#starts} == ${#lengths})) ||
+    die "internal error: starts and lengths don't correspond"
+if ((${#starts} == 0)); then
+    parse_end
+    exit 0
+fi
 
 # Parse the outro ("interpretation guide") for a non-empty input file.
-((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 [[ ${lines[li] =~ $outro } ]] || die 'malformed interpretation guide'
 readonly -i used_bytes="${BASH_REMATCH[1]}"
 readonly -i total_bytes="${BASH_REMATCH[2]}"
 readonly -i last_used_bytes="${BASH_REMATCH[3]}"
 readonly -i last_total_bytes="${BASH_REMATCH[4]}"
 
-# Check that the values parsed from the nontrivial outro make sense.
+# Check that the nontrivial outro doesn't directly contradict the table.
+((0 < ${#starts})) || die 'wrong interpretation guide for no extents'
 ((total_bytes == logical * sector_size)) ||
-    die 'total bytes used by file not equal to sum of extents'
+    die 'total bytes take up by file not equal to sum of extents'
+((last_total_bytes == count * sector_size)) ||
+    die 'inconsistent last-extent size'
+
+# Check that the values parsed in the nontrivial outro otherwise make sense.
 ((0 < used_bytes)) || die "no used bytes, but file isn't empty?"
 ((used_bytes <= total_bytes)) || die 'more bytes used than in all extents!'
 ((0 < last_used_bytes)) || die "last extent is unused, that's weird"
 ((last_used_bytes <= last_total_bytes)) ||
     die 'last extent has more bytes used than present!'
 
+# The input looks good and complete. Make sure there's no more of it.
+parse_end
 
 
+### Attempt to stitch the sectors together from the
 
 exec 3<"/sys/dev/block/$dev_major/0"
 
