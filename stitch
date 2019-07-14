@@ -124,6 +124,7 @@ done
 # FIXME: Simplify the following code, after debugging.
 [[ ${lines[li]} =~ $empty ]] || {
     msg "DEBUG: line $li: [${lines[li]}]"
+    msg "DEBUG: didn't match [$table_row]"
     die 'no empty line divides table from interpretation guide'
     # FIXME: ^^^ That error message doesn't really describe the likely cause.
 }
