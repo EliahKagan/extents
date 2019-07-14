@@ -125,8 +125,7 @@ done
 [[ ${lines[li]} =~ $empty ]] || {
     msg "DEBUG: line $li: [${lines[li]}]"
     msg "DEBUG: didn't match [$table_row]"
-    die 'no empty line divides table from interpretation guide'
-    # FIXME: ^^^ That error message doesn't really describe the likely cause.
+    die 'malformed table line or missing blank-line divider'
 }
 ((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
