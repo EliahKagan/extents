@@ -124,6 +124,7 @@ done
 [[ ${lines[li]} =~ $empty ]] || {
     msg "DEBUG: line $li: [${lines[li]}]"
     die 'no empty line divides table from interpretation guide'
+    # FIXME: ^^^ That error message doesn't really describe the likely cause.
 }
 ((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
