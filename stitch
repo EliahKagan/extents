@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# stitch - Takes a fiemap listing for a file. Outputs the contents of the file.
+# TODO: Replace this bash script with an awk -f or python3 script or C program.
+
+set -ef
+
+die() {
+    printf '%s: error: %s\n' "$0" "$1" >&2
+    exit 1
+}
+
+# FIXME: Write the script.

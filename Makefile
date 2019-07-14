@@ -8,30 +8,32 @@ else
 	CFLAGS += -Wall -Wextra
 endif
 
-target := fiemap
+mapper := fiemap
 srcs := $(wildcard *.c)
 objs := $(srcs:.c=.o)
 deps := $(srcs:.c=.d)
 
-$(target): $(objs)
+$(mapper): $(objs)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
-tester := $(target)-test
-test_input_path := test-symlink
-test_output_file := $(target).out
+stitcher := stitch
+test_file := test-symlink
+test_log := $(mapper).out
+stitched_file := $(test_file).stitched
 
-.PHONY: test
-test: $(target) $(tester) $(test_input_path)
-	./$(target) $(test_input_path) | tee $(test_output_file)
-	sudo ./$(tester) $(test_input_path) <$(test_output_file)
+.PHONY test
+test: $(mapper) $(stitcher) $(test_file)
+	./$(mapper) $(test_file) | tee $(test_log)
+	sudo ./$(stitcher) <$(test_log) >$(stitched_file)
+	cmp $(test_file) $(stitched_file)
 
 .PHONY: check
 check: test
 
 .PHONY: clean
 clean:
-	$(RM) $(target) $(objs) $(deps)
+	$(RM) $(mapper) $(objs) $(deps)
 
 -include $(deps)
