@@ -203,3 +203,5 @@ dd bs=1 skip="$last_full_bytes" count="$trailing_bytes" status=none <&3 ||
     die "can't read $trailing_bytes bytes at $last_full_bytes bytes (end)"
 
 exec 3<&- || die "can't close device node for disk $major:0"
+
+msg 'Stitching completed.'
