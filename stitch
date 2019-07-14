@@ -52,6 +52,7 @@ readonly sec='\(sec\)'
 lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
 labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
 readonly labels
+printf 'labels: [%s]\n' "$labels" >&2 # FIXME: remove after debugging
 
 # $table_row matches a row of the table (4 captures).
 readonly table_row="^$gap$num$gap$num$gap$num\$"
