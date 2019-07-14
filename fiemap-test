@@ -1,10 +1,12 @@
 #!/bin/bash
 #
-# run-fiemap-test
+# fiemap-test
 #
-# Runs fiemap and fiemap-test in the suggested way.
-# See the comment at the top of fiemap-test for details.
+# Runs fiemap on a file, and reconstitutes the file based on the locations and
+# sizes of the physical blocks provided by fiemap. Running fiemap need not
+# typically be done as root, but reading data directly from a block device does
+# require root privileges. Only that part of the job is elevated; sudo is used.
 
 set -ef
 set -o pipefail
-./fiemap "$@" | tee >(sudo ./fiemap-test "$@")
+./fiemap "$@" | tee >(sudo ./fiemap-test-backend "$@")
