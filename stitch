@@ -121,6 +121,7 @@ done
 
 # Parse the blank line after the table.
 ((li < lc)) || die 'input ends abruptly after table'
+# FIXME: Simplify the following code, after debugging.
 [[ ${lines[li]} =~ $empty ]] || {
     msg "DEBUG: line $li: [${lines[li]}]"
     die 'no empty line divides table from interpretation guide'
