@@ -2,6 +2,7 @@
 #
 # stitch - Takes a fiemap listing for a file. Outputs the contents of the file.
 #          TODO: Replace this with an awk -f or python3 script or a C program.
+#          FIXME: On a 32-bit system, does bash arithmetic have enough range?
 
 set -efo pipefail
 
