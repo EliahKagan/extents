@@ -20,5 +20,8 @@
 # Dumps from files and devices
 /dump*
 
-# Test outfile
+# Test outfiles
 /fiemap.out
+
+# Test reconstituted files
+*.stitched
