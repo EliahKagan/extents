@@ -29,7 +29,11 @@ find_node() {
     udevadm info -rq name "$meta"
 }
 
+# Don't change this. fiemap, dd, and Linux will still assume 512-byte sectors.
 declare -ri sector_size=512
+
+# Additional options to pass to dd.
+readonly -a dd_opts=('status=none')
 
 
 ##########################################################################
@@ -188,13 +192,13 @@ exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
 # Read data for all but the last extent.
 declare -i i
 for ((i = 0; i < ${#starts[@]} - 1; ++i)); do
-    dd skip="${starts[i]}" count="${lengths[i]}" status=none <&3 ||
+    dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" <&3 ||
         die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
 done
 
 # Read as many used full sectors as possible from the last extent.
 declare -ri last_full_sectors="$((last_used_bytes / sector_size))"
-dd skip="${starts[i]}" count="$last_full_sectors" status=none <&3 ||
+dd skip="${starts[i]}" count="$last_full_sectors" "${dd_opts[@]}" <&3 ||
     die "can't read $last_full_sectors sectors at ${starts[i]} (row $i)"
 
 # Read whatever remaining used data are stored in the last extent.
@@ -202,7 +206,7 @@ declare -ri trailing_bytes="$((last_used_bytes % sector_size))"
 declare -ri last_full_bytes="$((last_used_bytes - trailing_bytes))"
 ((last_full_bytes == last_full_sectors * sector_size)) ||
     bug 'last_full_bytes disagrees with last_full_sectors'
-dd bs=1 skip="$last_full_bytes" count="$trailing_bytes" status=none <&3 ||
+dd bs=1 skip="$last_full_bytes" count="$trailing_bytes" "${dd_opts[@]}" <&3 ||
     die "can't read $trailing_bytes bytes at $last_full_bytes bytes (end)"
 
 exec 3<&- || die "can't close device node for disk $dev_major:0"
