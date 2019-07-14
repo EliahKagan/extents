@@ -2,11 +2,69 @@
 # stitch - Takes a fiemap listing for a file. Outputs the contents of the file.
 # TODO: Replace this bash script with an awk -f or python3 script or C program.
 
-set -ef
+set -efo pipefail
 
 die() {
     printf '%s: error: %s\n' "$0" "$1" >&2
     exit 1
 }
 
-# FIXME: Write the script.
+readonly -i sector_size=512
+
+### Define the patterns (regexes) that match parts of fiemap's output. ###
+
+# $empty matches a blank line, which is used as a divider (no captures).
+readonly empty='^$'
+
+# These regexes appear as helpers in several of those to follow.
+readonly num='([0-9]+)'
+readonly gap=' {2,}'
+
+# $intro matches fiemap's first output line (4 captures).
+readonly device="block device $num:$num"       # capture groups 1 and 2
+readonly offset="byte $num \\(sector $num\\)"  # capture groups 3 and 4
+readonly intro="^On $device, which starts at $offset:\$"
+
+# $labels matches the table's columns headings (no captures).
+readonly sec='\(sec\)'
+lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
+readonly labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
+
+# $row matches a row of the table (4 captures).
+readonly row="^$gap$num$gap$num$gap$num\$"
+
+# $trivial matches fiemap's last output line for an empty file (no captures).
+readonly trivial='^There are no extents\.$'
+
+# $outro matches fiemap's last ouptut line otherwise (4 captures).
+readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
+
+
+### Read the input (i.e., fiemap output) and check it for consistency. ###
+
+declare -a lines
+mapfile -t lines
+readonly -i lc="${#lines}"
+((lc > 0)) || die 'no input'
+
+# Parse the intro line, which gives device information.
+[[ ${lines[0]} =~ $intro ]] || die 'malformed intro line'
+readonly -i dev_major="${BASH_REMATCH[1]}"
+readonly -i dev_minor="${BASH_REMATCH[2]}"
+readonly -i dev_start_byte="${BASH_REMATCH[3]}"
+readonly -i dev_start_sector="${BASH_REMATCH[4]}"
+((dev_start_sector * sector_size == dev_start_byte)) ||
+    die 'device start in bytes and sectors seem to disagree'
+
+# Parse the blank and column labels, which appear even if there are no rows.
+((lc > 1)) || die 'input ends abruptly after intro'
+[[ ${lines[1]} =~ $empty ]] || die 'no empty line divides intro from table'
+((lc > 2)) || 'no table (not even the row of column labels)'
+[[ ${lines[2]} =~ $labels ]] || die 'malformed column labels line'
+
+
+
+declare -i i
+for ((i = 0; i < lc; ++i)); do
+    :
+done

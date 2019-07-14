@@ -23,7 +23,7 @@ test_file := test-symlink
 test_log := $(mapper).out
 stitched_file := $(test_file).stitched
 
-.PHONY test
+.PHONY: test
 test: $(mapper) $(stitcher) $(test_file)
 	./$(mapper) $(test_file) | tee $(test_log)
 	sudo ./$(stitcher) <$(test_log) >$(stitched_file)
