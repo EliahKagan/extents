@@ -7,7 +7,7 @@
 #
 # TODO: Replace this bash script with a better awk -f script.
 
-set -f
+set -ef
 
 die() {
     printf '%s: error: %s\n' "$0" "$1" >&2

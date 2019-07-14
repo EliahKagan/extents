@@ -19,13 +19,13 @@ $(target): $(objs)
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 tester := $(target)-test
-test_input := test-symlink
-test_output := $(target).out
+test_input_path := test-symlink
+test_output_file := $(target).out
 
 .PHONY: test
-test: $(target) $(tester) $(test_input)
-	./$(target) $(test_input) >$(test_output)
-	sudo ./$(tester) $(test_input) <$(test_output)
+test: $(target) $(tester) $(test_input_path)
+	./$(target) $(test_input_path) | tee $(test_output_file)
+	sudo ./$(tester) $(test_input_path) <$(test_output_file)
 
 .PHONY: check
 check: test
