@@ -9,4 +9,5 @@
 
 set -ef
 set -o pipefail
+sudo -v
 ./fiemap "$@" | tee >(sudo ./fiemap-test-backend "$@")

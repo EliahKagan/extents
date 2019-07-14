@@ -8,4 +8,5 @@
 # TODO: Replace this bash script with a better awk -f script.
 
 set -f
-echo "$EUID"
+cat >/dev/null  # consume stdin
+echo "EUID=$EUID"
