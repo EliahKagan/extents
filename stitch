@@ -29,6 +29,8 @@ find_node() {
     udevadm info -rq name "$meta"
 }
 
+readonly -f msg die bug find_node
+
 # Don't change this. fiemap, dd, and Linux will still assume 512-byte sectors.
 declare -ri sector_size=512
 
@@ -57,6 +59,7 @@ readonly sec=' \(sec\)'
 lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
 labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
 readonly labels
+unset -f lab
 
 # $table_row matches a row of the table (4 captures).
 readonly table_row="^$gap$num$gap$num$gap$num$gap$num\$"
@@ -87,6 +90,7 @@ parse_end() {
             die 'unexpected non-empty trailing lines'
     done
 }
+readonly -f parse_end
 
 # Parse the intro line, which gives device information.
 ((li < lc)) || die 'no input'
@@ -108,6 +112,7 @@ declare -ri dev_start_sector="${BASH_REMATCH[4]}"
 declare -ai starts=() lengths=()
 declare -i logical=0 initial final count
 ldie() { die "row $((${#starts[@]} + 1)) (line $((li + 1))): $1"; }
+readonly -f ldie
 
 # Parse the entries from each table row, checking that they make sense.
 while ((++li < lc)) && [[ ${lines[li]} =~ $table_row ]]; do
