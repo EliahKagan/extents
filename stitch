@@ -50,9 +50,10 @@ readonly num='([0-9]+)'
 readonly gap=' {2,}'
 
 # $intro matches fiemap's first output line (4 captures).
-readonly device="block device $num:$num"       # capture groups 1 and 2
-readonly offset="byte $num \\(sector $num\\)"  # capture groups 3 and 4
+device="block device $num:$num"
+offset="byte $num \\(sector $num\\)"
 readonly intro="^On $device, which starts at $offset:\$"
+unset device offset
 
 # $labels matches the table's columns headings (no captures).
 readonly sec=' \(sec\)'
