@@ -29,7 +29,6 @@ bug). Because it has **alpha quality software**, you should *definitely* use
 `hdparm` instead, unless:
 
 - you need a utility that works as a non-root user, *or*
-
 - your goal is to develop, test, and/or sate your curiosity about `fiemap`.
 
 ## `stitch`
