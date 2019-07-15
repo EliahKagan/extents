@@ -4,23 +4,16 @@ This file lists TODO and FIXME items that aren't commented in the code, are
 likely to be missed on casual reading, or are particularly important or
 interesting.
 
-- Merge `test` into the master branch, since it's ready, and the new
-`README.md`file documents its presence!
-
-    What data type Bash uses for integers in arithmetic evaluation was my last
-    concern blocking the merge. I had thought it used `long` on all systems.
-    But I believe it acutally uses `intmax_t`. I should look into this
-    properly, of course, and also it's possible (and highly likely!) for the
-    maximum value of `__u64` from the kernel headers to be greater than that of
-    `intmax_t`, since `intmax_t` is signed. This case seems unlikely to arise
-    from running `fiemap` on a real-life disk, and it could be covered by
-    additional checks in `stitch`. While this shouldn't be ignored, I don't
-    think it needs to be regarded as a blocking problem, especially since
-    `fiemap` and `stitch` are currently unreleased alpha software.
-
-    After the merge, the still-relevant portions to this item can be placed in
-    a new item in this file and/or in a revised TODO or FIXME comment in
-    `stitch`, whereupon this item should be deleted.
+- I believe Bash uses `intmax_t` for integers in arithmetic evaluation, in
+which case the `stitch` script should work with numbers from real-world disks
+just fine. But I need to verify that it does actually do that. I should also
+add checks to `stitch` that cover overflow cases, because *(a)* it's supposed
+to be a robust parser that identifies obviously unreasonable input and *(b)* in
+theory, the range of `intmax_t` could be exceeded because it's signed and
+`__u64`—defined in the Linux kernel headers and used by the FIEMAP ioctl—is
+unsigned. (*Usually* `intmax_t` and `__u64` will be signed and unsigned types
+with the same size and alignment; so `__u64` can usually represent some values
+too big for `intmax_t`.)
 
 - Put short comments atop each functions briefly describing what it does. A few
 functions have this; most don't. Functions prototyped in header files should
