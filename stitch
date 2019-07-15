@@ -31,7 +31,7 @@ find_node() {
 
 readonly -f msg die bug find_node
 
-# Don't change this. fiemap, dd, and Linux will still assume 512-byte sectors.
+# Don't change this. fiemap, dd, and Linux would still assume 512-byte sectors.
 declare -ri sector_size=512
 
 # Additional options to pass to dd.
