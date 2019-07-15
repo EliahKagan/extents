@@ -8,7 +8,7 @@ interesting.
 which case the `stitch` script should work with numbers from real-world disks
 just fine. But I need to verify that it does actually do that.
 
-    Even assuming that *is* the case I should add checks to `stitch` that cover
+    Even assuming that is so, I should add checks to `stitch` that cover
     overflow cases, because:
 
     - it's supposed to be a robust parser that identifies obviously
