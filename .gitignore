@@ -26,4 +26,5 @@
 
 # Dumps from files and devices
 *.stitched
+*.stitched.old
 /dump*
