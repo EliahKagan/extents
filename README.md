@@ -4,9 +4,6 @@ This repository provides source code for a C program, `fiemap`, and a shell
 script, `stitch`, that can understand and use the output of `fiemap`. These
 utilities only run on GNU/Linux systems.
 
-Although potentiallu useful, this is currently *alpha quality software*. Except
-for testing and development purposes, if you can use `hdparm` instead, you
-
 `Makefile` contains rules for building `fiemap` and for testing it with
 `stitch`.
 
