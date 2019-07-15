@@ -22,8 +22,8 @@ extent, so for sparse files its output is probably never useful.
 
 Although potentially handy, `fiemap` doesn't attempt to detect or diagnose
 unusual cases (though it shouldn't *crash* due to them—if it does, that's a
-bug). Because it is **alpha quality software**, you should *definitely* use
-`hdparm` instead, unless:
+bug). Because it is **alpha software**, you should *definitely* use `hdparm`
+instead, unless:
 
 - you need a utility that works when run by a non-root user, *or*
 - your goal is to develop, test, and/or sate your curiosity about `fiemap`.
@@ -42,10 +42,10 @@ stop after it parses its input. Even this is arguably useful, as it still emits
 an error if the input isn't in the correct format or presents inconsistent
 information.
 
-`stitch` is also **alpha quality software**, which should give you some pause,
-being as it's a 200+ line shell script you run as root to directly access
-sectors on your disk. It should never write directly to those blocks, of
-course, and I don't *think* I made any big mistakes...
+`stitch` is also **alpha software**, which should give you some pause, being as
+it's a 200+ line shell script you run as root to directly access sectors on
+your disk. It should never write directly to those blocks, of course, and I
+don't *think* I made any big mistakes...
 
 ## How to Use
 
