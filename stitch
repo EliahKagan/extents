@@ -192,8 +192,8 @@ exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
 # Read data for all but the last extent.
 declare -i i
 for ((i = 0; i < ${#starts[@]} - 1; ++i)); do
-    # Redirecting in a subshell avoids undesired seeking of fd 3 in the parent.
-    (dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" <&3) ||
+    # Using </dev/fd/3 instead of <&3 avoids seeking fd 3 in the shell.
+    dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" </dev/fd/3 ||
         die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
 done
 
