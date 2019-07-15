@@ -192,7 +192,8 @@ exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
 # Read data for all but the last extent.
 declare -i i
 for ((i = 0; i < ${#starts[@]} - 1; ++i)); do
-    dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" <&3 ||
+    # Redirecting in a subshell avoids undesired seeking of fd 3 in the parent.
+    (dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" <&3) ||
         die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
 done
 
@@ -203,10 +204,7 @@ dd skip="${starts[i]}" count="$last_full_sectors" "${dd_opts[@]}" <&3 ||
 
 # Read whatever remaining used data are stored in the last extent.
 declare -ri trailing_bytes="$((last_used_bytes % sector_size))"
-declare -ri last_full_bytes="$((last_used_bytes - trailing_bytes))"
-((last_full_bytes == last_full_sectors * sector_size)) ||
-    bug 'last_full_bytes disagrees with last_full_sectors'
-dd bs=1 skip="$last_full_bytes" count="$trailing_bytes" "${dd_opts[@]}" <&3 ||
+dd bs=1 count="$trailing_bytes" "${dd_opts[@]}" <&3 ||
     die "can't read $trailing_bytes bytes at $last_full_bytes bytes (end)"
 
 exec 3<&- || die "can't close device node for disk $dev_major:0"
