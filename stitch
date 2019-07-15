@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+#
+# stitch - Takes a fiemap listing for a file. Outputs the contents of the file.
+#          TODO: Replace this with an awk -f or python3 script or a C program.
+#          FIXME: On a 32-bit system, does bash arithmetic have enough range?
+
+set -efo pipefail
+
+
+##########################################
+### Important functions and constants. ###
+##########################################
+
+# Prints a message. Since stdout is a sink for raw data, stderr is used.
+msg() { printf '%s: %s\n' "$0" "$1" >&2; }
+
+# Prints an error message and exits indicating failure.
+die() { msg "error: $1"; exit 1; }
+
+# Prints an error message marked "internal error" and exits indicating failure.
+bug() { die "internal error: $1"; }
+
+# Attempts to find a block device of known (major, minor) in the filesystem.
+find_node() {
+    local -ri major="$1" minor="$2"
+    local -r meta="/sys/dev/block/$major:$minor"
+
+    # FIXME: Add more methods, so this works on systems that don't use systemd!
+    udevadm info -rq name "$meta"
+}
+
+readonly -f msg die bug find_node
+
+# Don't change this. fiemap, dd, and Linux would still assume 512-byte sectors.
+declare -ri sector_size=512
+
+# Additional options to pass to dd.
+readonly -a dd_opts=('status=none')
+
+
+##########################################################################
+### Define the patterns (regexes) that match parts of fiemap's output. ###
+##########################################################################
+
+# $empty matches a blank line, which is used as a divider (no captures).
+readonly empty='^$'
+
+# These regexes appear as helpers in several of those to follow.
+readonly num='([0-9]+)'
+readonly gap=' {2,}'
+
+# $intro matches fiemap's first output line (4 captures).
+device="block device $num:$num"
+offset="byte $num \\(sector $num\\)"
+readonly intro="^On $device, which starts at $offset:\$"
+unset device offset
+
+# $labels matches the table's columns headings (no captures).
+readonly sec=' \(sec\)'
+lab() { printf '%s%s%s' "$gap" "$1" "$sec"; }
+labels="^$(lab LOGICAL)$(lab INITIAL)$(lab FINAL)$(lab COUNT)\$"
+readonly labels
+unset -f lab
+
+# $table_row matches a row of the table (4 captures).
+readonly table_row="^$gap$num$gap$num$gap$num$gap$num\$"
+
+# $trivial matches fiemap's last output line for an empty file (no captures).
+readonly trivial='^There are no extents\.$'
+
+# $outro matches fiemap's last ouptut line otherwise (4 captures).
+# This is the "outro" or "interpretation guide."
+readonly outro="^$num/$num bytes used, $num/$num in the last extent\\.\$"
+
+
+##########################################################################
+### Read the input (i.e., fiemap output) and check it for consistency. ###
+##########################################################################
+
+# Perform the actual IO read. After this, we are iterating an array.
+declare -a lines
+mapfile -t lines
+readonly lines
+declare -ri lc="${#lines[@]}"
+declare -i li=0
+
+# This function will be called after processing complete well-formed input.
+parse_end() {
+    while ((++li < lc)); do
+        [[ ${lines[li]} =~ $empty ]] ||
+            die 'unexpected non-empty trailing lines'
+    done
+}
+readonly -f parse_end
+
+# Parse the intro line, which gives device information.
+((li < lc)) || die 'no input'
+[[ ${lines[0]} =~ $intro ]] || die 'malformed intro line'
+declare -ri dev_major="${BASH_REMATCH[1]}"
+declare -ri dev_minor="${BASH_REMATCH[2]}"
+declare -ri dev_start_byte="${BASH_REMATCH[3]}"
+declare -ri dev_start_sector="${BASH_REMATCH[4]}"
+((dev_start_sector * sector_size == dev_start_byte)) ||
+    die 'device start in bytes and sectors seem to disagree'
+
+# Parse the blank and column labels, which appear even if there are no rows.
+((++li < lc)) || die 'input ends abruptly after intro'
+[[ ${lines[li]} =~ $empty ]] || die 'no empty line divides intro from table'
+((++li < lc)) || die 'no table (not even the row of column labels)'
+[[ ${lines[li]} =~ $labels ]] || die 'malformed column labels line'
+
+# Variables for parsing, and later using, information from table entries.
+declare -ai starts=() lengths=()
+declare -i logical=0 initial final count
+ldie() { die "row $((${#starts[@]} + 1)) (line $((li + 1))): $1"; }
+readonly -f ldie
+
+# Parse the entries from each table row, checking that they make sense.
+while ((++li < lc)) && [[ ${lines[li]} =~ $table_row ]]; do
+    ((BASH_REMATCH[1] == logical)) || ldie 'inconsistent logical offset'
+    initial="${BASH_REMATCH[2]}"
+    final="${BASH_REMATCH[3]}"
+    count="${BASH_REMATCH[4]}"
+
+    # FIXME: Does fiemap handle zero-length extents? Should it?
+    ((final - initial + 1 == count)) || ldie 'wrong initial-to-final count'
+
+    starts+=("$initial")
+    lengths+=("$count")
+    logical+="$count"
+done
+
+# Parse the blank line after the table.
+((li < lc)) || die 'input ends abruptly after table'
+[[ ${lines[li]} =~ $empty ]] ||
+    die 'malformed table line or missing blank-line divider'
+((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
+
+# Try to parse the outro ("interpretation guide") for an empty input file.
+((${#starts[@]} == ${#lengths[@]})) ||
+    bug "starts and lengths don't correspond"
+if ((${#starts[@]} == 0)); then
+    parse_end
+    exit
+fi
+
+# Parse the outro ("interpretation guide") for a non-empty input file.
+[[ ${lines[li]} =~ $outro ]] || die 'malformed interpretation guide'
+declare -ri used_bytes="${BASH_REMATCH[1]}"
+declare -ri total_bytes="${BASH_REMATCH[2]}"
+declare -ri last_used_bytes="${BASH_REMATCH[3]}"
+declare -ri last_total_bytes="${BASH_REMATCH[4]}"
+
+# Check that the nontrivial outro doesn't directly contradict the table.
+((0 < ${#starts[@]})) || die 'wrong interpretation guide for no extents'
+((total_bytes == logical * sector_size)) ||
+    die 'total bytes take up by file not equal to sum of extents'
+((last_total_bytes == count * sector_size)) ||
+    die 'inconsistent last-extent size'
+
+# Check that the values parsed in the nontrivial outro otherwise make sense.
+((0 < used_bytes)) || die "no used bytes, but file isn't empty?"
+((used_bytes <= total_bytes)) || die 'more bytes used than in all extents!'
+((0 < last_used_bytes)) || die "last extent is unused, that's weird"
+((last_used_bytes <= last_total_bytes)) ||
+    die 'last extent has more bytes used than present!'
+
+# The input looks good and complete. Make sure there's no more of it.
+parse_end
+
+
+##########################################################################
+### Attempt to stitch the sectors together by reading physical blocks. ###
+##########################################################################
+
+volume="$(find_node "$dev_major" "$dev_minor")" ||
+    die "can't find node for volume $dev_major:$dev_minor"
+readonly volume
+msg "The volume seems to be $dev_major:$dev_minor ($volume)."
+
+if ((dev_minor == 0)); then
+    readonly disk="$volume"
+else
+    # TODO: Research if this assumption is really sound.
+    disk="$(find_node "$dev_major" 0)" ||
+        die "can't find node for disk $dev_major:$dev_minor"
+    readonly disk
+fi
+msg "The disk seems to be $dev_major:0 ($disk)."
+
+# TODO: It's reasonable to run as a non-root user, if one just wants to test
+#       parsing. If/when getopt support is added, include options to force
+#       stopping or continuing here.
+((EUID == 0)) || die "you're not root; not trying to read blocks"
+
+exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
+
+((0 < ${#starts[@]})) || bug 'no blocks'
+
+# Read data for all but the last extent.
+declare -i i
+for ((i = 0; i < ${#starts[@]} - 1; ++i)); do
+    # This uses </dev/fd/3 instead of <&3 to avoid seeking fd 3 for the caller.
+    dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" </dev/fd/3 ||
+        die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
+done
+
+# Read as many used full sectors as possible from the last extent.
+declare -ri last_full_sectors="$((last_used_bytes / sector_size))"
+dd skip="${starts[i]}" count="$last_full_sectors" "${dd_opts[@]}" <&3 ||
+    die "can't read $last_full_sectors sectors at ${starts[i]} (row $i)"
+
+# Read whatever remaining used data are stored in the last extent.
+# (We're in the correct position from the last dd, which *did* seek our fd 3.)
+declare -ri trailing_bytes="$((last_used_bytes % sector_size))"
+declare -ri last_full_bytes="$((last_used_bytes - trailing_bytes))"
+((last_full_bytes == last_full_sectors * sector_size)) ||
+    bug 'last_full_bytes disagrees with last_full_sectors'
+dd bs="$trailing_bytes" count=1 "${dd_opts[@]}" <&3 ||
+    die "can't read $trailing_bytes bytes at $last_full_bytes bytes (end)"
+
+exec 3<&- || die "can't close device node for disk $dev_major:0"
+
+msg 'Stitching completed.'
