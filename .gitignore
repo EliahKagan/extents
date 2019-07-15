@@ -26,3 +26,4 @@
 
 # Test reconstituted files
 *.stitched
+*.stitched.old
