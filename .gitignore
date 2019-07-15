@@ -17,11 +17,12 @@
 # A symlink to a big file elsewhere
 /test-symlink
 
-# Dumps from files and devices
-/dump*
+# A file consisting of a long pattern of the same byte, for testing
+/test-mask
 
-# Test outfiles
+# Test outfiles - TODO: name these diferently (by the input file)
 /fiemap.out
+/fiemap.out.old
 
 # Test reconstituted files
 *.stitched
