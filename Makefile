@@ -3,9 +3,9 @@ override CFLAGS += $(sanitizers) -g -std=c11 -pedantic-errors
 override LDFLAGS += $(sanitizers)
 
 ifeq ($(shell ./is-clang $(CC)),yes)
-	CFLAGS += -Weverything -Wno-disabled-macro-expansion
+	override CFLAGS += -Weverything -Wno-disabled-macro-expansion
 else
-	CFLAGS += -Wall -Wextra
+	override CFLAGS += -Wall -Wextra
 endif
 
 mapper := fiemap
