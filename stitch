@@ -131,7 +131,8 @@ done
 ((++li < lc)) || die 'input ends abruptly, interpretation guide expected'
 
 # Try to parse the outro ("interpretation guide") for an empty input file.
-((${#starts[@]} == ${#lengths[@]})) || bug "starts and lengths don't correspond"
+((${#starts[@]} == ${#lengths[@]})) ||
+    bug "starts and lengths don't correspond"
 if ((${#starts[@]} == 0)); then
     parse_end
     exit
