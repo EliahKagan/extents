@@ -24,5 +24,6 @@
 /fiemap.out
 /fiemap.out.old
 
-# Test reconstituted files
+# Dumps from files and devices
 *.stitched
+/dump*
