@@ -187,8 +187,9 @@ else
 fi
 msg "The disk seems to be $dev_major:0 ($disk)."
 
-# TODO: It's reasonable to run as a non-root user, for the parsing. When getopt
-#       support is added, include options to force stopping or continuing here.
+# TODO: It's reasonable to run as a non-root user, if one just wants to test
+#       parsing. If/when getopt support is added, include options to force
+#       stopping or continuing here.
 ((EUID == 0)) || die "you're not root; not trying to read blocks"
 
 exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
@@ -198,7 +199,7 @@ exec 3<"$disk" || die "can't open device node for disk $dev_major:0"
 # Read data for all but the last extent.
 declare -i i
 for ((i = 0; i < ${#starts[@]} - 1; ++i)); do
-    # Using </dev/fd/3 instead of <&3 avoids seeking fd 3 in the shell.
+    # This uses </dev/fd/3 instead of <&3 to avoid seeking fd 3 for the caller.
     dd skip="${starts[i]}" count="${lengths[i]}" "${dd_opts[@]}" </dev/fd/3 ||
         die "can't read ${lengths[i]} sectors at ${starts[i]} (row $i)"
 done
