@@ -9,6 +9,10 @@
 # To the extent possible under law, the author(s) have dedicated all copyright
 # and related and neighboring rights to this software to the public domain
 # worldwide. This software is distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along
+# with this software. If not, see
+# <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 # TODO: Maybe replace this with an awk -f or python3 script or a C program.
 # FIXME: On a 32-bit system, does bash arithmetic have enough range?
