@@ -1,4 +1,4 @@
-# ioctl-1 - *querying file extents*
+# extents - *querying file extents*
 
 This repository provides source code for the C program `fiemap`, as well as the
 shell script `stitch` that understands and uses the ouput of `fiemap`. These
