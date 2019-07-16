@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 #
 # stitch - Takes a fiemap listing for a file. Outputs the contents of the file.
-#          TODO: Replace this with an awk -f or python3 script or a C program.
-#          FIXME: On a 32-bit system, does bash arithmetic have enough range?
+#
+# This file is part of extents, tools for querying and accessing file extents.
+#
+# Written in 2019 by Eliah Kagan <degeneracypressure@gmail.com>.
+#
+# To the extent possible under law, the author(s) have dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide. This software is distributed without any warranty.
+
+# TODO: Maybe replace this with an awk -f or python3 script or a C program.
+# FIXME: On a 32-bit system, does bash arithmetic have enough range?
 
 set -efo pipefail
 

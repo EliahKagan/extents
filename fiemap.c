@@ -1,4 +1,15 @@
-// fiemap.c - Trying out FIEMAP ioctl. See:
+// fiemap.c - Tries to list a file's extents on disk using the FIEMAP ioctl.
+//
+// This file is part of extents, tools for querying and accessing file extents.
+//
+// Written in 2019 by Eliah Kagan <degeneracypressure@gmail.com>.
+//
+// To the extent possible under law, the author(s) have dedicated all copyright
+// and related and neighboring rights to this software to the public domain
+// worldwide. This software is distributed without any warranty.
+
+// For more information about the FIEMAP ioctl, see:
+//
 //  - https://lwn.net/Articles/260803/ - documents FIEMAP as it was planned
 //  - https://lwn.net/Articles/287905/ - documents some important changes
 //  - https://github.com/torvalds/linux/blob/master/include/uapi/linux/fiemap.h

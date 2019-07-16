@@ -1,8 +1,23 @@
-## To Do
+## To-Do List
+
+*This file is part of **extents**, tools for querying and accessing file
+extents.*
+
+*Written in 2019 by Eliah Kagan \<degeneracypressure@gmail.com\>.*
+
+*To the extent possible under law, the author(s) have dedicated all copyright
+and related and neighboring rights to this software to the public domain
+worldwide. This software is distributed without any warranty.*
+
+*You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.*
 
 This file lists TODO and FIXME items that aren't commented in the code, are
 likely to be missed on casual reading, or are particularly important or
 interesting.
+
+---
+
+## To do:
 
 1. I believe Bash uses `intmax_t` for integers in arithmetic evaluation, in
 which case the `stitch` script should work with numbers from real-world disks
