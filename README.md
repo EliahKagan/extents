@@ -1,4 +1,4 @@
-# extents - *querying and accessing file extents*
+# extents - querying and accessing file extents
 
 *Written in 2019 by Eliah Kagan \<degeneracypressure@gmail.com\>.*
 
