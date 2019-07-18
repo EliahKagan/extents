@@ -1,5 +1,16 @@
 {
     "files.associations": {
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "sysmacros.h": "c",
+        "assert.h": "c",
+        "errno.h": "c",
+        "limits.h": "c",
+        "stdio.h": "c",
+        "string.h": "c",
+        "fiemap.h": "c",
+        "fs.h": "c",
+        "types.h": "c",
+        "ioctl.h": "c",
+        "stat.h": "c"
     }
 }
