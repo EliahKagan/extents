@@ -19,6 +19,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif
+
 // TODO: Find out why GNU getopt() doesn't process options that appear after
 //       non-option arguments with _POSIX_C_SOURCE 2 or _XOPEN_SOURCE, even
 //       when the POSIXLY_CORRECT environment variable is undefined at runtime
@@ -27,6 +28,10 @@
 //       this seemingly undocumented behavior. I do want to support non-leading
 //       options wherever feasible (so definitely when glibc is used).
 #define _GNU_SOURCE
+
+// Support files bigger than 2 GiB even on 32-bit systems.
+#define _FILE_OFFSET_BITS 64
+
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
