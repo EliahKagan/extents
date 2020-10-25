@@ -229,7 +229,8 @@ declare -ri trailing_bytes="$((last_used_bytes % sector_size))"
 declare -ri last_full_bytes="$((last_used_bytes - trailing_bytes))"
 ((last_full_bytes == last_full_sectors * sector_size)) ||
     bug 'last_full_bytes disagrees with last_full_sectors'
-dd bs="$trailing_bytes" count=1 "${dd_opts[@]}" <&3 ||
+((trailing_bytes == 0)) || # Special-case this, as dd does not accept bs=0.
+    dd bs="$trailing_bytes" count=1 "${dd_opts[@]}" <&3 ||
     die "can't read $trailing_bytes bytes at $last_full_bytes bytes (end)"
 
 exec 3<&- || die "can't close device node for disk $dev_major:0"
