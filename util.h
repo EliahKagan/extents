@@ -12,8 +12,8 @@
 // with this software. If not, see
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-#ifndef HAVE_IOCTL_1_FIEMAP_UTIL_H_
-#define HAVE_IOCTL_1_FIEMAP_UTIL_H_
+#ifndef HAVE_EXTENTS_FIEMAP_UTIL_H_
+#define HAVE_EXTENTS_FIEMAP_UTIL_H_
 
 #include "feature-test.h"
 
@@ -46,4 +46,4 @@ inline int max(const int first, const int second)
     return second > first ? second : first;
 }
 
-#endif // ! HAVE_IOCTL_1_FIEMAP_UTIL_H_
+#endif // ! HAVE_EXTENTS_FIEMAP_UTIL_H_

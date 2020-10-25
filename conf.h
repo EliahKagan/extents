@@ -12,8 +12,8 @@
 // with this software. If not, see
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-#ifndef HAVE_IOCTL_1_FIEMAP_CONF_H_
-#define HAVE_IOCTL_1_FIEMAP_CONF_H_
+#ifndef HAVE_EXTENTS_FIEMAP_CONF_H_
+#define HAVE_EXTENTS_FIEMAP_CONF_H_
 
 #include "feature-test.h"
 
@@ -32,4 +32,4 @@ ATTRIBUTE((nonnull))
 int get_table_configuration(int argc, char **restrict argv,
                             struct conf *restrict cp);
 
-#endif // ! HAVE_IOCTL_1_FIEMAP_CONF_H_
+#endif // ! HAVE_EXTENTS_FIEMAP_CONF_H_

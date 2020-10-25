@@ -12,8 +12,8 @@
 // with this software. If not, see
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-#ifndef HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
-#define HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
+#ifndef HAVE_EXTENTS_FIEMAP_FEATURE_TEST_H_
+#define HAVE_EXTENTS_FIEMAP_FEATURE_TEST_H_
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -31,4 +31,4 @@
 #pragma clang diagnostic pop
 #endif
 
-#endif // ! HAVE_IOCTL_1_FIEMAP_FEATURE_TEST_H_
+#endif // ! HAVE_EXTENTS_FIEMAP_FEATURE_TEST_H_

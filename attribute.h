@@ -12,11 +12,11 @@
 // with this software. If not, see
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-#ifndef HAVE_IOCTL_1_FIEMAP_ATTRIBUTE_H_
-#define HAVE_IOCTL_1_FIEMAP_ATTRIBUTE_H_
+#ifndef HAVE_EXTENTS_FIEMAP_ATTRIBUTE_H_
+#define HAVE_EXTENTS_FIEMAP_ATTRIBUTE_H_
 
 #ifdef __GNUC__
 #define ATTRIBUTE(x) __attribute__(x)
 #endif
 
-#endif // ! HAVE_IOCTL_1_FIEMAP_ATTRIBUTE_H_
+#endif // ! HAVE_EXTENTS_FIEMAP_ATTRIBUTE_H_

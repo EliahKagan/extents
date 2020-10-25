@@ -12,9 +12,9 @@
 // with this software. If not, see
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-#ifndef HAVE_IOCTL_1_FIEMAP_CONSTANTS_H_
-#define HAVE_IOCTL_1_FIEMAP_CONSTANTS_H_
+#ifndef HAVE_EXTENTS_FIEMAP_CONSTANTS_H_
+#define HAVE_EXTENTS_FIEMAP_CONSTANTS_H_
 
 enum filesystem_constants { k_sector_size = 512 };
 
-#endif // ! HAVE_IOCTL_1_FIEMAP_CONSTANTS_H_
+#endif // ! HAVE_EXTENTS_FIEMAP_CONSTANTS_H_
